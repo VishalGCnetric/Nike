@@ -10,7 +10,6 @@ function App() {
         <h1 className="text-4xl font-bold">Hello Tailwind!</h1>
       </header>
       <CartPage/>
-   <TrendingProjectsCarousel/>
       <Footer/>
     </div>
   );
