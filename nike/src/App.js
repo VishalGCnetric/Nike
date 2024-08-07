@@ -1,16 +1,17 @@
 import CartPage from "./Component/cart/CartPage";
 import Footer from "./Component/footer/Footer";
+import Navbar from "./Component/Header/Navbar";
+import AllRoutes from "./routes/AllRoutes";
 
 // src/App.js
 function App() {
   return (
-    <div className="">
-      <header className="bg-blue-500 text-white p-6">
-        <h1 className="text-4xl font-bold">Hello Tailwind!</h1>
-      </header>
-      <CartPage/>
+    <>
+    <Navbar/>
+      <AllRoutes/>
       <Footer/>
-    </div>
+    
+    </>
   );
 }
 
