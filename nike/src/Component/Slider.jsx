@@ -1,4 +1,6 @@
 import React, { useRef, useState } from 'react';
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 
 const shoes = [
     {
@@ -59,8 +61,8 @@ const PopularShoes = () => {
                     <h2 className="text-2xl font-bold mb-4">{text}</h2>
                 </div>
                 <div>
-                    <button className='border' onClick={scrollLeft}>previous</button>
-                    <button className='border' onClick={scrollRight}>forward</button>
+                    <button className='border rounded-full mr-2 h-10 w-10' onClick={scrollLeft}><IoIosArrowBack className='h-10 w-10 '/></button>
+                    <button className='border rounded-full' onClick={scrollRight}><IoIosArrowForward/></button>
                 </div>
             </div>
             <div className="overflow-x-scroll" ref={scrollContainerRef}>
