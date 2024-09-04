@@ -7,6 +7,9 @@ import CartPage from '../Component/cart/CartPage'
 import SignUp from '../Pages/SignUp'
 import SingIn from '../Pages/SingIn'
 import Order from '../Pages/Order'
+
+import ProductDetails from '../Pages/ProductDetails'
+
 const Checkout = lazy(() => import('../Pages/Checkout'));
 
 
@@ -20,8 +23,14 @@ const AllRoutes = () => {
 
        <Route path='/' element={<Homepage/>}/>
        <Route path='/cart' element={<CartPage/>}/>
+
+       <Route path='/product/:id' element={<ProductDetails/>}/>
+       <Route path= "/checkout/orderSummary" element={<Order/>}/>
+    </Routes>
+
        <Route path='/checkout/:step' element={<PrivateRoute><Checkout /></PrivateRoute>} />    </Routes>
        </Suspense>
+
   )
 }
 
