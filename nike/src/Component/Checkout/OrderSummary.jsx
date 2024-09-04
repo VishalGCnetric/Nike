@@ -1,6 +1,6 @@
 import React from 'react';
 
-const cardClass = "w-half p-4 bg-white shadow-md rounded-md";
+const cardClass = "w-full p-8 bg-white shadow-md rounded-md";
 const flexClass = "flex justify-between";
 const itemClass = "text-sm";
 

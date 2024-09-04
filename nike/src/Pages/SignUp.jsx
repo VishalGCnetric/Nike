@@ -1,3 +1,10 @@
+import React, { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+import { signupUser } from '../redux/slices/authSlices';;
+
+
 // import React from 'react';
 
 // const inputClasses = "border rounded p-2 w-full";
@@ -76,76 +83,57 @@
 // }
 
 // export default NikeSignupForm;
-import React from 'react';
+
 
 const NikeSignUpForm = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+  });
+  
+  const dispatch = useDispatch();
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(signupUser(formData));
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 font-sans">
-       <div className=" w-[100%] flex items-center justify-center space-x-2">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg"
-          alt="Nike Logo"
-          className="h-6 "
-        />
-        <img
-          src="https://th.bing.com/th?id=OIP.TWDOn4eq1Zipw770Qken7gHaG6&w=258&h=241&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2"
-          alt="Jordan Logo"
-          className="h-8 mr-72 "
-        />
+      <div className="w-[100%] flex items-center justify-center space-x-2">
+        {/* Logo section */}
       </div>
-      <h2 className="text-2xl font-bold mb-2">Now let's make you a Nike Member.</h2>
-      <p className="text-sm text-gray-700 mb-4">
-        We've sent a code to <span className="font-bold">vishalgiri197@gmail.com</span> <span className="text-blue-600 cursor-pointer">Edit</span>
-      </p>
-
-      <form>
-        <div className="mb-4 relative">
-          <input type="text" placeholder="Code*" required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <span className="absolute right-2 top-3 text-sm text-gray-500">Resend code in 1s</span>
-        </div>
-
+      <h2 className="text-2xl font-bold mb-2">Sign Up</h2>
+      <form onSubmit={handleSubmit}>
         <div className="flex space-x-4 mb-4">
-          <input type="text" placeholder="First Name*" required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <input type="text" placeholder="Last Name*" required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input type="text" name="firstName" placeholder="First Name*" value={formData.firstName} onChange={handleInputChange} required className="w-full px-4 py-2 border rounded" />
+          <input type="text" name="lastName" placeholder="Last Name*" value={formData.lastName} onChange={handleInputChange} required className="w-full px-4 py-2 border rounded" />
         </div>
-
         <div className="mb-4">
-          <input type="password" placeholder="Password*" required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <p className="text-xs text-gray-500 mt-2">
-            Minimum of 8 characters
-            <br />
-            Uppercase, lowercase letters, and one number
-          </p>
+          <input type="email" name="email" placeholder="Email*" value={formData.email} onChange={handleInputChange} required className="w-full px-4 py-2 border rounded" />
         </div>
-
         <div className="mb-4">
-          <select required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="" disabled selected>Select Shopping Preference*</option>
-            <option value="men">Men</option>
-            <option value="women">Women</option>
-            <option value="kids">Kids</option>
-          </select>
+          <input type="password" name="password" placeholder="Password*" value={formData.password} onChange={handleInputChange} required className="w-full px-4 py-2 border rounded" />
         </div>
-
         <div className="mb-4">
-          <input type="date" required className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <p className="text-xs text-gray-500 mt-2">Get a Nike Member Reward on your birthday.</p>
+          <input type="text" name="phoneNumber" placeholder="Phone Number*" value={formData.phoneNumber} onChange={handleInputChange} required className="w-full px-4 py-2 border rounded" />
         </div>
-
-        <div className="mb-4 flex items-start space-x-2">
-          <input type="checkbox" id="emailUpdates" className="mt-1" />
-          <label htmlFor="emailUpdates" className="text-sm">Sign up for emails to get updates from Nike on products, offers and your Member benefits.</label>
-        </div>
-
-        <div className="mb-6 flex items-start space-x-2">
-          <input type="checkbox" id="agreeTerms" required className="mt-1" />
-          <label htmlFor="agreeTerms" className="text-sm">I agree to Nike's <span className="text-blue-600 cursor-pointer">Privacy Policy</span> and <span className="text-blue-600 cursor-pointer">Terms of Use</span>.</label>
-        </div>
-
-        <button type="submit" className="w-full bg-black text-white py-3 rounded-lg text-center font-semibold hover:bg-gray-800 transition duration-200">Create Account</button>
+        <button type="submit" className="w-full bg-black text-white py-3 rounded-lg">Create Account</button>
+        <div className="mt-6 text-center">
+        <p className="text-sm">Not a member? <a href="/auth/signin" className="text-blue-600">Sing In</a></p>
+      </div>
       </form>
+      <ToastContainer />
     </div>
   );
-}
+};
 
 export default NikeSignUpForm;
+
