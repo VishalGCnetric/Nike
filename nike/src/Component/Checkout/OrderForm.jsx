@@ -13,8 +13,8 @@ const sharedClasses = {
 
 const OrderForm = () => {
   return (
-    <div className="flex flex-col justify-between  md:flex-row p-6 bg-card border rounded-lg">
-      <div className="md:w-[40%] pr-4">
+    <div className="flex flex-col justify-around  md:flex-row p-6 bg-card border rounded-lg">
+      <div className="w-full p-8 ">
         <h2 className="text-2xl font-bold mb-4">How would you like to get your order?</h2>
         <p className={sharedClasses.textMuted + " mb-4"}>
           Customs regulation for India require a copy of the recipient's KYC. The address on the KYC needs to match the shipping address.
@@ -40,8 +40,7 @@ const OrderForm = () => {
         <span className={sharedClasses.textMuted}>A carrier might contact you to confirm delivery.</span>
      <IDClearanceForm/>
       </div>
-     
-      <OrderSummary/>
+      
     </div>
   );
 };

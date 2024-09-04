@@ -1,5 +1,6 @@
 import React from 'react';
 import CartItem from './CartItem'; // Adjust the path as necessary
+import { useNavigate } from 'react-router-dom';
 const cartItems = [
   {
     id: 1,
@@ -24,6 +25,7 @@ const cartItems = [
 ];
 
 const CartPage = () => {
+  const navigate=useNavigate();
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-semibold mb-6">Bag</h2>
@@ -48,7 +50,7 @@ const CartPage = () => {
               <span>Total:</span>
               <span>₹ 48,240.00</span>
             </div>
-            <button className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800">
+            <button onClick={()=>{navigate("/checkout/address")}} className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800">
               Member Checkout
             </button>
           </div>
