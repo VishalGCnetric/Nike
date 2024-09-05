@@ -1,61 +1,104 @@
-import React from 'react';
-import CartItem from './CartItem'; // Adjust the path as necessary
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCart, updateCartItem, deleteCartItem } from '../../redux/slices/cartSlice';
+import CartItem from './CartItem';
 import { useNavigate } from 'react-router-dom';
-const cartItems = [
-  {
-    id: 1,
-    name: "Nike Alphafly 3 Electric",
-    type: "Women's Road Racing Shoes",
-    color: "Multi-Colour/Multi-Colour",
-    size: 4,
-    quantity: 1,
-    price: 23495,
-    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/w_592,f_auto,q_auto:eco,b_rgb:f5f5f5/19cd86fb-51c7-4daa-b9a9-69ad8b6bc9f5/alphafly-3-electric-road-racing-shoes-nXnRWH.png", 
-  },
-  {
-    id: 2,
-    name: "Nike Alphafly 3 Electric",
-    type: "Women's Road Racing Shoes",
-    color: "Multi-Colour/Multi-Colour",
-    size: 3.5,
-    quantity: 3,
-    price: 23495,
-    imageUrl: "https://static.nike.com/a/images/t_PDP_1728_v1/w_592,f_auto,q_auto:eco,b_rgb:f5f5f5/19cd86fb-51c7-4daa-b9a9-69ad8b6bc9f5/alphafly-3-electric-road-racing-shoes-nXnRWH.png", 
-  },
-];
+import { Dialog, DialogActions, DialogTitle, DialogContent } from '@mui/material';
+import ShoppingLoader from '../Loader/ShoppingLoader';
 
 const CartPage = () => {
-  const navigate=useNavigate();
+  const dispatch = useDispatch();
+  const { cart, status } = useSelector((state) => state.cart);
+  const { token } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, token]);
+
+  const handleQuantityChange = (itemId, newQuantity) => {
+    dispatch(updateCartItem({ lineId: itemId, quantity: newQuantity }));
+  };
+
+  const handleDelete = (itemId) => {
+    setOpenModal(true);
+    setSelectedItem(itemId);
+  };
+
+  const confirmDelete = () => {
+    dispatch(deleteCartItem(selectedItem));
+    setOpenModal(false);
+  };
+
+  if (!token) {
+    return <div className="text-center">No items in your cart. Please log in to view your cart.</div>;
+  }
+  if (status === 'loading') {
+    return <ShoppingLoader />;
+  }
+
+  if (!cart || cart.lines.length === 0) {
+    return (
+      <div className="container mx-auto p-4">
+        <h2 className="text-2xl font-semibold mb-6">Bag</h2>
+        <div className="flex justify-center">
+          <p className="text-lg text-gray-600">No items in your cart.</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-semibold mb-6">Bag</h2>
-      <div className="flex flex-col lg:flex-row">
-        <div className="flex-1">
-          {cartItems.map((item) => (
-            <CartItem key={item.id} item={item} />
-          ))}
-        </div>
-        <div className="w-full lg:w-1/3 lg:pl-6 mt-8 lg:mt-0">
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Summary</h2>
-            <div className="flex justify-between mb-2">
-              <span>Subtotal:</span>
-              <span>₹ 46,990.00</span>
+      {status === 'loading' ? (
+        <ShoppingLoader/>
+      ) : (
+        <div className="flex flex-col lg:flex-row">
+          <div className="flex-1">
+            {cart?.lines?.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                onQuantityChange={(newQuantity) => handleQuantityChange(item.id, newQuantity)}
+                onDelete={() => handleDelete(item.id)}
+              />
+            ))}
+          </div>
+          <div className="w-full lg:w-1/3 lg:pl-6 mt-8 lg:mt-0">
+            <div className="bg-gray-100 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Summary</h2>
+              <div className="flex justify-between mb-2">
+                <span>Subtotal:</span>
+                <span>₹ {cart?.total.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Total Quantity:</span>
+                <span>{cart?.totalQuantity}</span>
+              </div>
+              <button
+                onClick={() => navigate('/checkout/address')}
+                className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+              >
+                Member Checkout
+              </button>
             </div>
-            <div className="flex justify-between mb-2">
-              <span>Estimated Delivery & Handling:</span>
-              <span>₹ 1,250.00</span>
-            </div>
-            <div className="flex justify-between font-semibold text-lg mb-6">
-              <span>Total:</span>
-              <span>₹ 48,240.00</span>
-            </div>
-            <button onClick={()=>{navigate("/checkout/address")}} className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800">
-              Member Checkout
-            </button>
           </div>
         </div>
-      </div>
+      )}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>Are you sure you want to remove this item?</DialogContent>
+        <DialogActions>
+          <button onClick={confirmDelete} className="text-red-500">
+            Confirm
+          </button>
+          <button onClick={() => setOpenModal(false)}>Cancel</button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -1,41 +1,72 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { fetchCart } from '../../redux/slices/cartSlice';
 
 const cardClass = "w-full p-8 bg-white shadow-md rounded-md";
 const flexClass = "flex justify-between";
 const itemClass = "text-sm";
 
 const OrderSummary = () => {
-    return (
-        <div className={cardClass}>
-            <h2 className="text-lg font-semibold text-zinc-800">Order Summary</h2>
-            <div className="mt-4">
-                <p className={flexClass}><span>Subtotal</span><span>₹ 46,990.00</span></p>
-                <p className={flexClass}><span>Delivery/Shipping</span><span>₹ 1,250.00</span></p>
-                <hr className="my-2" />
-                <p className={`${flexClass} font-bold`}><span>Total</span><span>₹ 48,240.00</span></p>
-            </div>
-            <p className={`${itemClass} mt-1`}>(The total reflects the price of your order, including all duties and taxes)</p>
-            <h3 className="mt-4 font-semibold">Arrives Tue, 13 Aug - Fri, 16 Aug</h3>
-            <div className="flex items-start mt-4 space-x-4">
-                <img aria-hidden="true" alt="Nike Alphafly 3 Electric Women's Road Racing Shoes (UK Size 3.5)" src="https://static.nike.com/a/images/t_PDP_1728_v1/w_592,f_auto,q_auto:eco,b_rgb:f5f5f5/19cd86fb-51c7-4daa-b9a9-69ad8b6bc9f5/alphafly-3-electric-road-racing-shoes-nXnRWH.png" className="w-32 h-32 object-cover rounded-md" />
-                <div>
-                    <h4 className="font-medium">Nike Alphafly 3 Electric Women's Road Racing Shoes</h4>
-                    <p className={itemClass}>Qty 1</p>
-                    <p className={itemClass}>Size UK 3.5</p>
-                    <p className="font-bold">₹ 23,495.00</p>
-                </div>
-            </div>
-            <div className="flex items-start mt-4 space-x-4">
-                <img aria-hidden="true" alt="Nike Alphafly 3 Electric Women's Road Racing Shoes (UK Size 4)" src="https://static.nike.com/a/images/t_PDP_1728_v1/w_592,f_auto,q_auto:eco,b_rgb:f5f5f5/19cd86fb-51c7-4daa-b9a9-69ad8b6bc9f5/alphafly-3-electric-road-racing-shoes-nXnRWH.png" className="w-32 h-32 object-cover rounded-md" />
-                <div>
-                    <h4 className="font-medium">Nike Alphafly 3 Electric Women's Road Racing Shoes</h4>
-                    <p className={itemClass}>Qty 1</p>
-                    <p className={itemClass}>Size UK 4</p>
-                    <p className="font-bold">₹ 23,495.00</p>
-                </div>
-            </div>
+  const { step } = useParams();
+  const dispatch = useDispatch();
+  const { cart, status } = useSelector((state) => state.cart);
+  const { token } = useSelector((state) => state.auth);
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, token]);
+  // console.log(cart)
+//   if (!cart || cart?.lines.length === 0) {
+//     return (
+//       <div className="flex justify-center">
+//         <p className="text-lg text-gray-600">No items in your order.</p>
+//       </div>
+//     );
+//   }
+
+  return (
+    <div className={cardClass}>
+      <h2 className="text-lg font-semibold text-zinc-800">Order Summary</h2>
+      <div className="mt-4">
+        <p className={flexClass}><span>Subtotal</span><span>₹ {cart?.total.toLocaleString()||0}</span></p>
+        <p className={flexClass}><span>Delivery/Shipping</span><span>₹ {cart?.shipping||0}</span></p>
+        <hr className="my-2" />
+        <p className={`${flexClass} font-bold`}><span>Total</span><span>₹ {(cart?.total + cart?.shipping||0).toLocaleString()}</span></p>
+      </div>
+      <p className={`${itemClass} mt-1`}>(The total reflects the price of your order, including all duties and taxes)</p>
+      {step === 'payment' && (
+        <button
+          className="w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+          onClick={() => console.log('Proceed to payment')}
+        >
+          Checkout
+        </button>
+      )}
+      <h3 className="mt-4 font-semibold">Arrives {cart?.arrivesDate}</h3>   
+
+      {cart?.lines?.map((item) => (
+        <div key={item.id} className="flex items-start mt-4 space-x-4">
+          <img
+            aria-hidden="true"
+            alt={`${item?.productVariant?.name} (UK Size ${item?.size})`}
+            src={item?.productVariant?.images?.[0]?.url|| item?.productVariant?.featuredAsset?.url}
+            className="w-32 h-32 object-cover rounded-md"
+          />
+          <div>
+            <h4 className="font-medium">{item?.productVariant?.name}</h4>
+            <p className={itemClass}>Qty {item?.quantity}</p>
+            <p className={itemClass}>Size UK {item?.size}</p>
+            <p className="font-bold">₹ {item?.linePrice.toLocaleString()}</p>
+          </div>
         </div>
-    );
+      ))}
+
+      {/* Show the checkout button only when the step is 'payment' */}
+     
+    </div>
+  );
 };
 
 export default OrderSummary;
