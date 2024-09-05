@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+const api = process.env.REACT_APP_BASE_URL;
 
 // Asynchronous action to handle the checkout API request
 export const initiateCheckout = (cartId, shippingAddress) => async (dispatch) => {
     try {
-        const response = await axios.post(`${REACT_APP_BASE_URL}/checkout`, {
+        const response = await axios.post(`${api}/checkout`, {
             cartId,
             shippingAddress,
         }, {
