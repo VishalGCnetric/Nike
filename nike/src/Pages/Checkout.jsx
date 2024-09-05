@@ -5,6 +5,7 @@ import BillingComponent from '../Component/Checkout/BillingDetails'
 import OrderSummary from '../Component/Checkout/OrderSummary';
 import { useParams } from 'react-router-dom'
 import PaymentForm from '../Component/Checkout/Payment';
+import AddressForm from '../Component/Checkout/AdressForm';
 
 const Checkout = () => {
     const {step}=useParams()
@@ -12,7 +13,7 @@ const Checkout = () => {
     <div className="mx-auto w-[80%] md:flex md:justify-around">
 <div className="md:w-[50%] ">
 {step=="address"?<>
-<OrderForm/>
+<AddressForm/>
 </>:step=="shipping"?<OrderDetails/>:step=="billing"?<BillingComponent/>:step=="payment"?<PaymentForm/>:<OrderForm/>}
 </div>
 

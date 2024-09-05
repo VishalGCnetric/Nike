@@ -1,4 +1,5 @@
 import React from 'react';
+import DeliveryInformation from './DeliveryInformation';
 
 const sharedClasses = {
     textZinc: 'text-zinc-600 dark:text-zinc-400',
@@ -29,7 +30,7 @@ const OrderDetails = () => {
                 </p>
             </div>
             <button className={sharedClasses.button}>Continue</button>
-            <DeliveryInformation />
+            {/* <DeliveryInformation /> */}
             <ShippingInformation />
             <BillingInformation />
             <PaymentInformation />
@@ -37,25 +38,9 @@ const OrderDetails = () => {
     );
 };
 
-const DeliveryInformation = () => {
-    return (
-        <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
-            <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Delivery</h4>
-            <div className="flex justify-between items-center">
-                <p className={sharedClasses.textZinc}>Vishal Giri</p>
-                <button className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
-                    Edit
-                </button>
-            </div>
-            <p className={sharedClasses.textZinc}>At post Irla</p>
-            <p className={sharedClasses.textZinc}>vishal@centric.com</p>
-            <p className={sharedClasses.textZinc}>097671 76108</p>
-            <p className={sharedClasses.textZinc}>PAN</p>
-        </div>
-    );
-};
 
-const ShippingInformation = () => {
+
+ export const ShippingInformation = () => {
     return (
         <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
             <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Shipping</h4>
@@ -64,20 +49,20 @@ const ShippingInformation = () => {
     );
 };
 
-const BillingInformation = () => {
+export const BillingInformation = () => {
     return (
         <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
             <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Billing</h4>
-            <p className={sharedClasses.textZinc}>Your billing information goes here.</p>
+            {/* <p className={sharedClasses.textZinc}>Your billing information goes here.</p> */}
         </div>
     );
 };
 
-const PaymentInformation = () => {
+export const PaymentInformation = () => {
     return (
         <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
             <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Payment</h4>
-            <p className={sharedClasses.textZinc}>Your payment information goes here.</p>
+            {/* <p className={sharedClasses.textZinc}>Your payment information goes here.</p> */}
         </div>
     );
 };
