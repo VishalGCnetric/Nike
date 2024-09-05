@@ -12,7 +12,7 @@ const initialState = {
 // Signup thunk
 export const signupUser = createAsyncThunk('auth/signupUser', async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post('http://106.51.242.196:50102/signup', userData);
+    const response = await axios.post(`${REACT_APP_BASE_URL}/signup`, userData);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -25,7 +25,7 @@ export const signupUser = createAsyncThunk('auth/signupUser', async (userData, {
 // Login thunk
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post('http://106.51.242.196:50102/login', credentials);
+    const response = await axios.post(`${REACT_APP_BASE_URL}/login`, credentials);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {

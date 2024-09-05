@@ -4,7 +4,7 @@ import axios from 'axios';
 // Asynchronous action to handle the checkout API request
 export const initiateCheckout = (cartId, shippingAddress) => async (dispatch) => {
     try {
-        const response = await axios.post('http://106.51.242.196:50102/checkout', {
+        const response = await axios.post(`${REACT_APP_BASE_URL}/checkout`, {
             cartId,
             shippingAddress,
         }, {

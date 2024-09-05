@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.get('http://106.51.242.196:50102/cart', {
+    const response = await axios.get(`${REACT_APP_BASE_URL}/cart`, {
       headers: { accesstoken: token },
     });
     return response.data.cart;
@@ -19,7 +19,7 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWi
 export const updateCartItem = createAsyncThunk('cart/updateCartItem', async ({ lineId, quantity }, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.put('http://106.51.242.196:50102/cart', {
+    const response = await axios.put(`${REACT_APP_BASE_URL}/cart`, {
       lineId,
       quantity,
     }, {
@@ -35,7 +35,7 @@ export const updateCartItem = createAsyncThunk('cart/updateCartItem', async ({ l
 export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async (lineId, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.delete(`http://106.51.242.196:50102/cart?lineId=${lineId}`, {
+    const response = await axios.delete(`${REACT_APP_BASE_URL}/cart?lineId=${lineId}`, {
       headers: { accesstoken: token },
     });
     return response.data.cart;
