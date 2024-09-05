@@ -28,6 +28,55 @@ const Homepage = () => {
       <div>
         <SlickSliderComponent />
       </div>
+      <div className="container mx-auto px-12 py-8">
+      <h2 className="text-3xl font-bold mb-6">The Latest</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {/* Card 1 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Nike Zenvy Collection"
+            className="w-full h-56 object-cover"
+          />
+          <div className="p-4">
+            <h3 className="text-xl font-semibold mb-2">Nike Zenvy Collection</h3>
+            <a href="#" className="text-primary hover:underline">
+              Shop Now
+            </a>
+          </div>
+        </div>
+
+        {/* Card 2 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Kylian Mbappé Mercurial"
+            className="w-full h-56 object-cover"
+          />
+          <div className="p-4">
+            <h3 className="text-xl font-semibold mb-2">Kylian Mbappé Mercurial</h3>
+            <a href="#" className="text-primary hover:underline">
+              Shop Now
+            </a>
+          </div>
+        </div>
+
+        {/* Card 3 */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+          <img
+            src="https://placehold.co/400x300"
+            alt="Train Like LeBron in the TR1"
+            className="w-full h-56 object-cover"
+          />
+          <div className="p-4">
+            <h3 className="text-xl font-semibold mb-2">Train Like LeBron in the TR1</h3>
+            <a href="#" className="text-primary hover:underline">
+              Shop Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
 
   )
