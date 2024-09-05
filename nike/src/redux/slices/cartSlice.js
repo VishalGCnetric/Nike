@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const api = process.env.REACT_APP_BASE_URL;
 
 // Thunk to fetch cart data
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.get(`${REACT_APP_BASE_URL}/cart`, {
+    const response = await axios.get(`${api}/cart`, {
       headers: { accesstoken: token },
     });
     return response.data.cart;
@@ -19,7 +20,7 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWi
 export const updateCartItem = createAsyncThunk('cart/updateCartItem', async ({ lineId, quantity }, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.put(`${REACT_APP_BASE_URL}/cart`, {
+    const response = await axios.put(`${api}/cart`, {
       lineId,
       quantity,
     }, {
@@ -35,7 +36,7 @@ export const updateCartItem = createAsyncThunk('cart/updateCartItem', async ({ l
 export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async (lineId, { rejectWithValue, getState }) => {
   const token = getState().auth.token;
   try {
-    const response = await axios.delete(`${REACT_APP_BASE_URL}/cart?lineId=${lineId}`, {
+    const response = await axios.delete(`${api}/cart?lineId=${lineId}`, {
       headers: { accesstoken: token },
     });
     return response.data.cart;

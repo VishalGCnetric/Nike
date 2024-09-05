@@ -8,11 +8,11 @@ const initialState = {
   status: 'idle',
   error: null,
 };
-
+const api = process.env.REACT_APP_BASE_URL;
 // Signup thunk
 export const signupUser = createAsyncThunk('auth/signupUser', async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${REACT_APP_BASE_URL}/signup`, userData);
+    const response = await axios.post(`${api}/signup`, userData);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -25,7 +25,7 @@ export const signupUser = createAsyncThunk('auth/signupUser', async (userData, {
 // Login thunk
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post(`${REACT_APP_BASE_URL}/login`, credentials);
+    const response = await axios.post(`${api}/login`, credentials);
     return response.data;
   } catch (error) {
     if (error.response && error.response.data) {
