@@ -11,6 +11,7 @@ import Order from '../Pages/Order'
 import ProductDetails from '../Pages/ProductDetails'
 import ProfilePage from '../Pages/Profile'
 import OrderList from '../Pages/OrderList'
+import OrderDetails from '../Pages/OrderDetails'
 
 const Checkout = lazy(() => import('../Pages/Checkout'));
 
@@ -29,9 +30,10 @@ const AllRoutes = () => {
        <Route path='/product/:id' element={<ProductDetails/>}/>
        <Route path= "/checkout/orderSummary" element={<Order/>}/>
        <Route path='/checkout/:step' element={<PrivateRoute><Checkout /></PrivateRoute>} />   
-       {/* <Route path='/profile' element={<PrivateRoute><ProfilePage /></PrivateRoute>} />    */}
-       <Route path='/profile' element={<ProfilePage />} />   
+       <Route path='/profile' element={<PrivateRoute><ProfilePage /></PrivateRoute>} />   
+      
        <Route path='/all-orders' element={<PrivateRoute><OrderList /></PrivateRoute>} />   
+       <Route path='/order/:id' element={<PrivateRoute><OrderDetails /></PrivateRoute>} />   
     </Routes>
 
        </Suspense>
