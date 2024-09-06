@@ -1,14 +1,38 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Banner1 from '../Assests/homeAssests/banner1.png'
 import Slider from '../Component/Slider'
 import SlickSliderComponent from '../Component/Swiper'
+import axios from 'axios'
+import ShoppingLoader from '../Component/Loader/ShoppingLoader'
 
 const Homepage = () => {
+  const [loading,setLoading] = useState(false)
+  const [data,setData] = useState([])
+
+  useEffect(()=>{
+    const fetchData =async()=>{
+      setLoading(true)
+      const response = await axios.get('http://106.51.242.196:50102/content')
+      setData(response.data)
+      setLoading(false)
+    }
+    
+    fetchData()
+  },[])
+  const popularProductSliders = data.filter(image => image.title.includes('popular product slider'));
+  const thepopularSpotlight = data.filter(image => image.title.includes('the popular spotlight'));
+  const mainImage = data.filter(image => image.title.includes('main banner'));
+  const latestImage = data.filter(image => image.title.includes('the latest'));
+
+  if(loading){
+    return <ShoppingLoader/>
+  }
+
   return (
     <div className="w-full ">
       <div className="pl-6 pr-6">
         <img
-          src={Banner1}
+          src={mainImage?.[0]?.url}
           alt="Nike Electric Pack"
           className="w-full h-full object-cover"
         />
@@ -23,20 +47,20 @@ const Homepage = () => {
         </div>
       </div>
       <div>
-        <Slider />
+        <Slider data={popularProductSliders} />
       </div>
       <div>
-        <SlickSliderComponent />
+        <SlickSliderComponent data={thepopularSpotlight} />
       </div>
-      <div className="container mx-auto px-12 py-8">
+      <div className="container w-full mx-auto px-2 py-8">
       <h2 className="text-3xl font-bold mb-6">The Latest</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {/* Card 1 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
           <img
-            src="https://placehold.co/400x300"
+            src={latestImage?.[0]?.url}
             alt="Nike Zenvy Collection"
-            className="w-full h-56 object-cover"
+            className="w-full h-full object-cover"
           />
           <div className="p-4">
             <h3 className="text-xl font-semibold mb-2">Nike Zenvy Collection</h3>
@@ -49,9 +73,9 @@ const Homepage = () => {
         {/* Card 2 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
           <img
-            src="https://placehold.co/400x300"
+          src={latestImage?.[1]?.url}
             alt="Kylian Mbappé Mercurial"
-            className="w-full h-56 object-cover"
+            className="w-full h-full object-cover"
           />
           <div className="p-4">
             <h3 className="text-xl font-semibold mb-2">Kylian Mbappé Mercurial</h3>
@@ -64,16 +88,16 @@ const Homepage = () => {
         {/* Card 3 */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
           <img
-            src="https://placehold.co/400x300"
+            src={latestImage?.[2]?.url}
             alt="Train Like LeBron in the TR1"
-            className="w-full h-56 object-cover"
+            className="w-full h-full object-cover"
           />
-          <div className="p-4">
+          {/* <div className="p-4">
             <h3 className="text-xl font-semibold mb-2">Train Like LeBron in the TR1</h3>
             <a href="#" className="text-primary hover:underline">
               Shop Now
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const SlickSliderComponent = () => {
+const SlickSliderComponent = ({data}) => {
   const sliderRef = useRef(null);
 
   const settings = {
@@ -51,17 +51,17 @@ const SlickSliderComponent = () => {
   <h2 className="text-2xl font-bold text-center mb-6">Classics Spotlight</h2>
   <div className="relative">
     <Slider ref={sliderRef} {...settings}>
-      {['KILLSHOT', 'AIR JORDAN 1', 'DUNK', 'BLAZER', 'AIR FORCE 1'].map((item, index) => (
+      {data.map((item, index) => (
         <div key={index} className="px-2">
           <div className="relative">
             <img 
-              src={`https://placehold.co/150x150?text=${item.replace(/\s+/g, '+')}`} 
-              alt={item} 
+              src={item.url} 
+              alt={item.title} 
               className="w-full h-auto rounded-lg"
             />
-            <span className="absolute bottom-0 left-0 right-0 text-center text-sm sm:text-base lg:text-lg font-bold text-white bg-black bg-opacity-50 px-2 py-1">
+            {/* <span className="absolute bottom-0 left-0 right-0 text-center text-sm sm:text-base lg:text-lg font-bold text-white bg-black bg-opacity-50 px-2 py-1">
               {item}
-            </span>
+            </span> */}
           </div>
         </div>
       ))}
