@@ -19,10 +19,10 @@ const AddressForm = () => {
         city: '',
         postalCode: '',
         state: '',
-        country: 'IN', // Default to India
+        country: '', // Default to India
         phoneNumber: '',
-        isDefaultBilling: true,
-        defaultShippingAddress: isSameAsBilling,
+        // isDefaultBilling: true,
+        // defaultShippingAddress: false,
     });
 
     // Function to fetch address details based on postal code
@@ -35,7 +35,8 @@ const AddressForm = () => {
                     ...formData,
                     city,
                     state,
-                    country: response.data.country, // This can be 'IN' if needed
+                    country: response.data.country,
+                    postalCode:postalCode 
                 });
             }
         } catch (error) {
@@ -54,25 +55,25 @@ const AddressForm = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(formData));
 
         // Update URL parameter to move to the next step (e.g., 'shipping')
-        setSearchParams({ step: 'shipping' });
+        // setSearchParams({ step: 'shipping' });
 
         // Optional: Navigate to the next step
-        // navigate('/payment'); 
+        navigate('/checkout/shipping'); 
     };
 
     // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
-
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
         // If postalCode is being changed, fetch address details
         if (name === 'postalCode' && value.length === 6) {
             fetchAddressFromPostalCode(value);
         }
 
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+       
     };
 
     // Handle checkbox change
@@ -80,7 +81,7 @@ const AddressForm = () => {
         setIsSameAsBilling(e.target.checked);
         setFormData({
             ...formData,
-            defaultShippingAddress: !formData.defaultShippingAddress,
+            // defaultShippingAddress: !formData.defaultShippingAddress,
         });
     };
 
@@ -148,11 +149,11 @@ const AddressForm = () => {
                 </div>
 
                 <div className="block mb-2">
-                    <label className="text-muted-foreground">City</label>
+                    <label className="text-muted-foreground">Phone Number</label>
                     <input
                         type="text"
-                        name="city"
-                        value={formData.city}
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
                         onChange={handleChange}
                         className="mt-1 block w-full rounded-md p-2 border border-border"
                         required
@@ -170,7 +171,17 @@ const AddressForm = () => {
                         required
                     />
                 </div>
-
+                <div className="block mb-2">
+                    <label className="text-muted-foreground">City</label>
+                    <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="mt-1 block w-full rounded-md p-2 border border-border"
+                        required
+                    />
+                </div>
                 <div className="block mb-2">
                     <label className="text-muted-foreground">State</label>
                     <input
@@ -182,18 +193,18 @@ const AddressForm = () => {
                         required
                     />
                 </div>
-
                 <div className="block mb-2">
-                    <label className="text-muted-foreground">Phone Number</label>
+                    <label className="text-muted-foreground">Country</label>
                     <input
                         type="text"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
+                        name="country"
+                        value={formData.country}
                         onChange={handleChange}
                         className="mt-1 block w-full rounded-md p-2 border border-border"
                         required
                     />
                 </div>
+               
 
                 {/* Checkbox for Billing Address same as Shipping */}
                 <div className="block mb-4">
@@ -204,7 +215,7 @@ const AddressForm = () => {
                             onChange={handleCheckboxChange}
                             className="mr-2"
                         />
-                        Billing address is the same as shipping
+                        Shipping address is the same as current address
                     </label>
                 </div>
 

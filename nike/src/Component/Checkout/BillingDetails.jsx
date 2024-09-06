@@ -1,4 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import DeliveryInformation from './DeliveryInformation';
 
 // Shared Tailwind CSS classes
 const twClasses = {
@@ -13,6 +15,8 @@ const twClasses = {
 };
 
 const BillingComponent = () => {
+                  const navigate=useNavigate();
+
   return (
     <div className={twClasses.container}>
       <h2 className={twClasses.header}>What's your billing address?</h2>
@@ -20,16 +24,19 @@ const BillingComponent = () => {
         <input type='checkbox' id='billingMatches' className='mr-2' defaultChecked />
         <label htmlFor='billingMatches' className={twClasses.checkboxLabel}>Billing matches shipping address</label>
       </div>
-      <button className={twClasses.button}>Continue</button>
+      <button                  onClick={()=>{navigate("/checkout/payment")}}
+          className="w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+      >Continue</button>
       <div className={twClasses.border}></div>
       <div>
-        <h3 className={twClasses.subHeader}>Delivery</h3>
+        {/* <h3 className={twClasses.subHeader}>Delivery</h3>
         <p className={twClasses.content}>Vishal Giri</p>
         <p className={twClasses.content}>At post Irla</p>
         <p className={twClasses.content}>vishal@centric.com</p>
         <p className={twClasses.content}>097671 76108</p>
         <p className={twClasses.content}>PAN</p>
-        <button className={twClasses.editButton}>Edit</button>
+        <button className={twClasses.editButton}>Edit</button> */}
+        <DeliveryInformation/>
       </div>
       <div className={twClasses.border}></div>
       <div>
