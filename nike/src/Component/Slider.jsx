@@ -2,36 +2,36 @@ import React, { useRef, useState } from 'react';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 
-const shoes = [
-    {
-        name: 'Nike Vaporfly 3 Electric',
-        description: "Women's Road Racing Shoes",
-        price: '₹ 21 395.00',
-        imageUrl: 'https://placehold.co/300x300?text=Nike+Vaporfly+3+Electric',
-    },
-    {
-        name: 'Nike Invincible 3 Electric',
-        description: "Men's Road Running Shoes",
-        price: '₹ 17 595.00',
-        imageUrl: 'https://placehold.co/300x300?text=Nike+Invincible+3+Electric',
-    },
-    {
-        name: 'Nike InfinityRN 4 Electric',
-        description: "Men's Road Running Shoes",
-        price: '₹ 15 595.00',
-        imageUrl: 'https://placehold.co/300x300?text=Nike+InfinityRN+4+Electric',
-    },
-    {
-        name: 'Nike InfinityRN 4 Electric',
-        description: "Men's Road Running Shoes",
-        price: '₹ 15 595.00',
-        imageUrl: 'https://placehold.co/300x300?text=Nike+InfinityRN+4+Electric',
-    },
-];
+// const shoes = [
+//     {
+//         name: 'Nike Vaporfly 3 Electric',
+//         description: "Women's Road Racing Shoes",
+//         price: '₹ 21 395.00',
+//         imageUrl: 'https://placehold.co/300x300?text=Nike+Vaporfly+3+Electric',
+//     },
+//     {
+//         name: 'Nike Invincible 3 Electric',
+//         description: "Men's Road Running Shoes",
+//         price: '₹ 17 595.00',
+//         imageUrl: 'https://placehold.co/300x300?text=Nike+Invincible+3+Electric',
+//     },
+//     {
+//         name: 'Nike InfinityRN 4 Electric',
+//         description: "Men's Road Running Shoes",
+//         price: '₹ 15 595.00',
+//         imageUrl: 'https://placehold.co/300x300?text=Nike+InfinityRN+4+Electric',
+//     },
+//     {
+//         name: 'Nike InfinityRN 4 Electric',
+//         description: "Men's Road Running Shoes",
+//         price: '₹ 15 595.00',
+//         imageUrl: 'https://placehold.co/300x300?text=Nike+InfinityRN+4+Electric',
+//     },
+// ];
 
 const text="Popular Right Now"
 
-const PopularShoes = () => {
+const PopularShoes = ({data}) => {
     const scrollContainerRef = useRef(null);
 
     const scrollLeft = () => {
@@ -67,19 +67,19 @@ const PopularShoes = () => {
             </div>
             <div className="overflow-x-scroll" ref={scrollContainerRef}>
                 <div className="flex space-x-4 w-[calc(100vw*3/4)]">
-                    {shoes.map((shoe, index) => (
+                    {data.map((shoe, index) => (
                         <div
                             key={index}
                             className="bg-white rounded-lg shadow-md p-4 w-1/3 cursor-pointer shrink-0"
                         >
                             <img
-                                src={shoe.imageUrl}
-                                alt={shoe.name}
+                                src={shoe.url}
+                                alt={shoe.title}
                                 className="w-full h-48 object-cover rounded-md mb-2"
                             />
-                            <h3 className="text-lg font-semibold">{shoe.name}</h3>
+                            {/* <h3 className="text-lg font-semibold">{shoe.name}</h3>
                             <p className="text-zinc-600">{shoe.description}</p>
-                            <p className="text-lg font-bold mt-2">MRP: {shoe.price}</p>
+                            <p className="text-lg font-bold mt-2">MRP: {shoe.price}</p> */}
                         </div>
                     ))}
                 </div>

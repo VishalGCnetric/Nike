@@ -2,26 +2,43 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { getProductById } from '../redux/slices/productSlices';
 import { useParams } from 'react-router-dom';
-import { Toaster, toast } from 'react-hot-toast';
+// import { Toaster, toast } from 'react-hot-toast';
 import ShoppingLoader from '../Component/Loader/ShoppingLoader';
+import Select from 'react-select';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { addToCart } from '../redux/slices/addToCart';
+
+const Option = (props) => {
+    return (
+        <div {...props.innerProps} className="flex items-center p-2">
+            <img
+                src={props.data.image}
+                alt={props.data.label}
+                className="w-16 h-16 object-cover rounded mr-2"
+            />
+            <span>{props.data.label}</span>
+        </div>
+    );
+};
 
 const ProductDetails = () => {
     const [productData, setProductData] = useState({});
     const [variantData, setVariantData] = useState({});
-    const [mainImage, setMainImage] = useState();
+    const [mainImage, setMainImage] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const dispatch = useDispatch();
     const params = useParams();
-
     const containerRef = useRef(null);
 
     const scroll = (direction) => {
         if (containerRef.current) {
-            const scrollAmount = 100; // Adjust scroll amount as needed
+            const scrollAmount = 100;
             containerRef.current.scrollBy({
                 top: direction === 'down' ? scrollAmount : -scrollAmount,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         }
     };
@@ -30,9 +47,10 @@ const ProductDetails = () => {
         const fetchData = async () => {
             try {
                 const response = await dispatch(getProductById(params.id));
-                setProductData(response.payload.product);
-                setVariantData(response.payload.product.variants[0]);
-                setMainImage(response.payload.product.variants?.[0].images[0].url);
+                const product = response.payload.product;
+                setProductData(product);
+                setVariantData(product.variants[0]);
+                setMainImage(product.variants[0]?.images[0]?.url);
             } catch (err) {
                 setError('Failed to fetch product details');
                 toast.error('Failed to fetch product details');
@@ -46,10 +64,28 @@ const ProductDetails = () => {
     if (loading) return <ShoppingLoader />;
     if (error) return <div>{error}</div>;
 
+    // Prepare options for react-select
+    const variantOptions = productData?.variants?.map((variant) => ({
+        value: variant.id,
+        label: variant.name,
+        image: variant.images[0]?.url,
+    })) || [];
+
+    const notify = () => toast.success("Product Added to Cart");
+    const handleAddToCart =async()=>{
+        const data ={
+            productVariantId:variantData.id,
+            quantity:1
+        }
+        console.log(data)
+       const response = await dispatch(addToCart(data))
+       notify()
+    }
+
     return (
         <>
-            <Toaster />
-            <div className="container mx-auto px-4 py-6 md:px-28">
+            <ToastContainer />
+            <div className="container mx-auto px-4 py-6 md:px-18">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Side - Images */}
                     <div className="col-span-1">
@@ -58,7 +94,7 @@ const ProductDetails = () => {
                             <div className="relative md:w-1/6 flex-shrink-0 flex flex-col">
                                 {/* Thumbnail Images Container */}
                                 <div
-                                    className="flex flex-col h-full w-full space-y-2 overflow-y-auto scrollbar-hide"
+                                    className="flex flex-col h-full w-full space-y-2 overflow-hidden"
                                     style={{ maxHeight: '500px' }}
                                     ref={containerRef}
                                 >
@@ -105,49 +141,46 @@ const ProductDetails = () => {
                     </div>
 
 
-
-
                     {/* Right Side - Details */}
                     <div className="col-span-1 space-y-4">
-                        <h1 className="text-xl md:text-2xl font-semibold">{productData?.name}</h1>
-                        <p className="text-gray-500">{variantData?.name}</p>
+                        <h1 className="text-xl md:text-2xl font-semibold">{variantData?.name}</h1>
                         <p className="text-lg md:text-xl font-bold">MRP: ₹ {variantData?.price?.toLocaleString('en-IN')}</p>
                         <p className="text-sm text-gray-400">Incl. of taxes</p>
+                        <p className="text-sm text-gray-500" dangerouslySetInnerHTML={{ __html: productData?.description }}></p>
                         <div className="space-y-4">
-                        <div className="flex flex-wrap space-x-2">
-    {productData?.variants?.map((variant) => (
-        <div key={variant.id}  onClick={() => {
-            setVariantData(variant);
-            setMainImage(variant.images[0].url);
-        }}
-        className={`px-2 py-1 border rounded cursor-pointer ${variantData.id === variant.id ? 'bg-gray-200' : 'bg-white'}`}>
-            <img
-                height="40px"  // Adjusted for better visibility
-                width="40px"   // Adjusted for better visibility
-                src={variant?.images[0].url}
-                alt={`Variant ${variant.id}`}
-                className="object-cover rounded"
-            />
-            <span
-               
-            >
-                {variant.attributes.size || variant.attributes.Size}
-            </span>
-        </div>
-    ))}
-</div>
-
-
-                            <button className="w-full bg-black text-white py-3 rounded">
-                                Add to Bag
-                            </button>
+                            {/* Variant Selector */}
+                            <Select
+                                options={variantOptions}
+                                onChange={(selectedOption) => {
+                                    const selectedVariant = productData.variants.find(variant => variant.id === selectedOption.value);
+                                    setVariantData(selectedVariant);
+                                    setMainImage(selectedVariant.images[0].url);
+                                }}
+                                getOptionLabel={(option) => option.label}
+                                getOptionValue={(option) => option.value}
+                                components={{ Option }}
+                                value={variantOptions.find(option => option.value === variantData?.id)}
+                                placeholder="Select a variant"
+                                className="basic-single"
+                                classNamePrefix="select"
+                            />
+                            {/* Display selected variant details */}
+                            {variantData && (
+                                <div className="mt-4 flex items-center">
+                                    {variantData.attributes.color?.split('/').map((color, index) => (
+                                        <span key={index} className="mr-2 px-2 py-1 border rounded text-sm">
+                                            {color}
+                                        </span>
+                                    ))}
+                                    <span className="ml-4">{variantData.attributes.size || variantData.attributes.Size || 'No size specified'}</span>
+                                </div>
+                            )}
+                            <button onClick={handleAddToCart} className="w-full bg-black text-white py-3 rounded">Add to Bag</button>
                             <button className="w-full border py-3 rounded flex items-center justify-center space-x-2">
                                 <span>Favourite</span>
                                 <span>♡</span>
                             </button>
-                            <p className="text-sm text-gray-500">{productData?.description}</p>
                         </div>
-
                         <ul className="text-gray-700 list-disc pl-4">
                             <li>Colour Shown: Multi-Colour/Multi-Colour</li>
                             <li>Style: FZ8753-900</li>
