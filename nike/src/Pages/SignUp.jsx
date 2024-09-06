@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
-import { signupUser } from '../redux/slices/authSlices';;
+import { signupUser } from '../redux/slices/authSlices';import { useNavigate } from 'react-router-dom';
+;
 
 
 // import React from 'react';
@@ -93,7 +94,7 @@ const NikeSignUpForm = () => {
     password: '',
     phoneNumber: '',
   });
-  
+  const navigate= useNavigate();
   const dispatch = useDispatch();
 
   const handleInputChange = (e) => {
@@ -102,7 +103,9 @@ const NikeSignUpForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(signupUser(formData));
+    dispatch(signupUser(formData)).then(()=>{
+      navigate("/auth/signin")
+    });
   };
 
   return (
@@ -127,7 +130,7 @@ const NikeSignUpForm = () => {
         </div>
         <button type="submit" className="w-full bg-black text-white py-3 rounded-lg">Create Account</button>
         <div className="mt-6 text-center">
-        <p className="text-sm">Not a member? <a href="/auth/signin" className="text-blue-600">Sing In</a></p>
+        <p className="text-sm">Not a member? <a href="/auth/signin" className="text-blue-600">Sign In</a></p>
       </div>
       </form>
       <ToastContainer />

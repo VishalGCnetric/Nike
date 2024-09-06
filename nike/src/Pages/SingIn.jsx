@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { loginUser } from '../redux/slices/authSlices';
 import { useDispatch } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const NikeSignInForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+  const navigate= useNavigate();
 
   const handleEmailChange = (e) => setEmail(e.target.value);
   const handlePasswordChange = (e) => setPassword(e.target.value);
@@ -14,7 +16,9 @@ const NikeSignInForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add your sign-in logic here
-    dispatch(loginUser({ email, password }));
+    dispatch(loginUser({ email, password })).then(()=>{
+      navigate("/")
+    });;
   };
 
   return (
