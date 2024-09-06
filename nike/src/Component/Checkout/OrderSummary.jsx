@@ -17,6 +17,9 @@ const OrderSummary = () => {
       dispatch(fetchCart());
     }
   }, [dispatch, token]);
+  if (cart?.id){
+    localStorage.setItem("cartId",cart?.id)
+  }
   // console.log(cart)
 //   if (!cart || cart?.lines.length === 0) {
 //     return (
@@ -36,14 +39,14 @@ const OrderSummary = () => {
         <p className={`${flexClass} font-bold`}><span>Total</span><span>₹ {(cart?.total + cart?.shipping||0).toLocaleString()}</span></p>
       </div>
       <p className={`${itemClass} mt-1`}>(The total reflects the price of your order, including all duties and taxes)</p>
-      {step === 'payment' && (
+      {/* {step === 'payment' && (
         <button
           className="w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
           onClick={() => console.log('Proceed to payment')}
         >
           Checkout
         </button>
-      )}
+      )} */}
       <h3 className="mt-4 font-semibold">Arrives {cart?.arrivesDate}</h3>   
 
       {cart?.lines?.map((item) => (

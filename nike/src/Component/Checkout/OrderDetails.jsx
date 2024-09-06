@@ -5,6 +5,7 @@ import { Modal, Button } from '@mui/material';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import ShopDetails from './ShopDetails';
+import { useNavigate } from 'react-router-dom';
 
 const sharedClasses = {
     textZinc: 'text-zinc-600 dark:text-zinc-400',
@@ -34,6 +35,7 @@ const OrderDetails = () => {
     const [userLocation, setUserLocation] = useState(null);
     const [dealers, setDealers] = useState(initialShops);
     const [isContinueEnabled, setIsContinueEnabled] = useState(false);
+    const navigate=useNavigate();
 
     useEffect(() => {
         // Calculate arrival date (5 days from now)
@@ -107,31 +109,10 @@ const OrderDetails = () => {
                 <p className="p-4 text-zinc-700 dark:text-zinc-300">Arrives {arrivalDate}</p>
             </div>
 
-            <ShopDetails/>
+            <ShopDetails setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
             <div className="mt-6">
-                <h3 className="text-md font-semibold text-zinc-800 dark:text-zinc-200">
-                    Choose a shipping method
-                </h3>
-                <div className="flex gap-4 mt-2">
-                    <label className="flex items-center">
-                        <input
-                            type="radio"
-                            checked={selectedOption === 'Ship from Dealer'}
-                            onChange={() => handleOptionChange('Ship from Dealer')}
-                            className="mr-2"
-                        />
-                        Ship from Dealer
-                    </label>
-                    <label className="flex items-center">
-                        <input
-                            type="radio"
-                            checked={selectedOption === 'Pickup from Dealer'}
-                            onChange={() => handleOptionChange('Pickup from Dealer')}
-                            className="mr-2"
-                        />
-                        Pickup from Dealer
-                    </label>
-                </div>
+               
+               
 
                 {selectedDealer && (
                     <div className="mt-4">
@@ -147,8 +128,9 @@ const OrderDetails = () => {
                 </p>
             </div>
             <button
-                className={`${sharedClasses.button} ${isContinueEnabled ? '' : 'opacity-50 cursor-not-allowed'}`}
-                disabled={!isContinueEnabled}
+                className={`${sharedClasses.button} ${isContinueEnabled ? '' : ''}`}
+                // disabled={!isContinueEnabled}
+                onClick={()=>{navigate("/checkout/billing")}}
             >
                 Continue
             </button>
