@@ -1,31 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { clearOrdersState, getAllOrders } from '../redux/slices/orders';
 
 const OrderList = () => {
     const [data, setData] = useState([]);
+    const dispatch = useDispatch()
 
     useEffect(() => {
-        // Mock function to simulate fetching data
-        const fetchData = async () => {
-            try {
-                // Simulate fetching orders data
-                const orders = {
-                    orders: {
-                        items: [
-                            { id: '1234', orderPlacedAt: '2023-08-10T10:20:30Z', totalWithTax: 1500, state: 'Delivered' },
-                            { id: '5678', orderPlacedAt: '2023-08-12T14:22:00Z', totalWithTax: 2300, state: 'Pending' },
-                            // Add more mock orders as needed
-                        ]
-                    }
-                };
-                setData(orders.orders.items);
-            } catch (error) {
-                console.error('Error fetching customer orders:', error);
-            }
-        };
+        const fetchData =async()=>{
 
-        fetchData();
-    }, []);
+           const response= await dispatch(getAllOrders());
+          setData(response.payload.orders.items)
+        }
+        fetchData()
+        
+      }, []);
+
+      console.log(data )
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -81,7 +73,7 @@ const OrderList = () => {
                                 </span>
                             </td>
                             <td className="p-3 text-left border-b md:p-2">
-                                <Link to={`/account/order/${el?.id}`} className="underline text-blue-600 hover:text-red-600">
+                                <Link to={`/order/${el?.id}`} className="underline text-blue-600 hover:text-red-600">
                                     View details
                                 </Link>
                             </td>

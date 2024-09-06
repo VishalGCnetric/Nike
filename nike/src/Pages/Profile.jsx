@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { getUserDetails } from '../redux/slices/orders';
 
 const ProfilePage = () => {
   const [data, setData] = useState({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const storedState = localStorage.getItem('state');
-    if (storedState) {
-      try {
-        const parsedState = JSON.parse(storedState);
-        if (parsedState && parsedState.auth && parsedState.auth.user && parsedState.auth.user.user) {
-          setData(parsedState.auth.user.user);
-        }
-      } catch (error) {
-        console.error('Error parsing JSON from localStorage', error);
-      }
-    }
-  }, []);
+    const fetchData = async () => {
+      const response = await dispatch(getUserDetails());
+      setData(response.payload.data.activeCustomer);
+    };
+    fetchData();
+  }, [dispatch]);
+
+  // Find the default billing and shipping addresses
+  const defaultBillingAddress = data?.addresses?.find(address => address.defaultBillingAddress);
+  const defaultShippingAddress = data?.addresses?.find(address => address.defaultShippingAddress);
 
   return (
     <div className="container mx-auto p-4">
       {/* Navigation */}
      
-
       {/* Content */}
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
@@ -46,8 +46,8 @@ const ProfilePage = () => {
           <div className="mb-8">
             <h3 className="text-xl font-bold mb-4">Account Information</h3>
             <div>
-              <p><b>Name:</b> {data?.name || 'N/A'}</p>
-              <p><b>Email:</b> {data?.email || 'N/A'}</p>
+              <p><b>Name:</b> {`${data?.firstName || 'N/A'} ${data?.lastName || ''}`}</p>
+              <p><b>Email:</b> {data?.emailAddress || 'N/A'}</p>
               <p><b>Phone Number:</b> {data?.phoneNumber || 'N/A'}</p>
             </div>
           </div>
@@ -60,12 +60,33 @@ const ProfilePage = () => {
           <div className="flex justify-between">
             <div className="w-1/2 pr-4">
               <h3 className="text-xl font-bold mb-2">Default Billing Address</h3>
-              <p>You have not set a default billing address.</p>
+              {defaultBillingAddress ? (
+                <div>
+                  <p>{defaultBillingAddress.fullName}</p>
+                  <p>{defaultBillingAddress.streetLine1}, {defaultBillingAddress.streetLine2}</p>
+                  <p>{defaultBillingAddress.city}, {defaultBillingAddress.province}, {defaultBillingAddress.postalCode}</p>
+                  <p>{defaultBillingAddress.country.name}</p>
+                  <p>{defaultBillingAddress.phoneNumber}</p>
+                </div>
+              ) : (
+                <p>You have not set a default billing address.</p>
+              )}
               <Link to="#" className="text-primary hover:underline">EDIT ADDRESS</Link>
             </div>
+
             <div className="w-1/2 pl-4">
               <h3 className="text-xl font-bold mb-2">Default Shipping Address</h3>
-              <p>You have not set a default shipping address.</p>
+              {defaultShippingAddress ? (
+                <div>
+                  <p>{defaultShippingAddress.fullName}</p>
+                  <p>{defaultShippingAddress.streetLine1}, {defaultShippingAddress.streetLine2}</p>
+                  <p>{defaultShippingAddress.city}, {defaultShippingAddress.province}, {defaultShippingAddress.postalCode}</p>
+                  <p>{defaultShippingAddress.country.name}</p>
+                  <p>{defaultShippingAddress.phoneNumber}</p>
+                </div>
+              ) : (
+                <p>You have not set a default shipping address.</p>
+              )}
               <Link to="#" className="text-primary hover:underline">EDIT ADDRESS</Link>
             </div>
           </div>

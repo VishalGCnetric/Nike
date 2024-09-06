@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const api = process.env.REACT_APP_BASE_URL;
+
 const initialState = {
   product: null,
   status: 'idle', // idle | loading | succeeded | failed
@@ -13,7 +15,7 @@ export const getProductById = createAsyncThunk(
   'product/getProductById',
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://106.51.242.196:50102/product?productId=${productId}`);
+      const response = await axios.get(`${api}/product?productId=${productId}`);
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
