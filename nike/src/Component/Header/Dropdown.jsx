@@ -1,13 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Dropdown = ({ sections, dropdownFunction, dropDownName }) => {
+const Dropdown = ({ sections, onMouseEnter, onMouseLeave }) => {
   return (
     <div
-     
-      // onMouseEnter={() => dropdownFunction(dropDownName)}
-      // onMouseLeave={() => dropdownFunction(null)}
-      className="bg-white mt-8 rounded-lg shadow-lg w-full"
+      className="bg-white absolute left-0 top-full mt-2 rounded-lg shadow-lg w-screen"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div className="overflow-x-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
