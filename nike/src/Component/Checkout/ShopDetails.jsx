@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Button, Checkbox, FormControlLabel } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const shopIcon = new L.Icon({
   iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854866.png',
@@ -42,10 +43,10 @@ const ShopDetails = ({ selectedOption, setSelectedOption }) => {
   const [nearbyShops, setNearbyShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
   const [isContinueEnabled, setIsContinueEnabled] = useState(false);
-  
+  const {shippingAddress}=useSelector((state)=>state.checkout)
 const navigate=useNavigate();
   useEffect(() => {
-    const savedShippingAddress = JSON.parse(localStorage.getItem('shippingAddress'));
+    const savedShippingAddress =shippingAddress|| JSON.parse(localStorage.getItem('shippingAddress'));
     if (savedShippingAddress) {
       fetchCoordinates(savedShippingAddress);
     }
@@ -146,18 +147,18 @@ const navigate=useNavigate();
       <ToastContainer />
       <div className="mt-2">
         <h3 className="text-md font-semibold">Choose a shipping method</h3>
-        <div>
+        <div className= "flex gap-2">
         <FormControlLabel
-          control={<Checkbox checked={selectedOption === 'Shipping'} onChange={handleOptionChange} value="Shipping" />}
+          control={<input type="radio" checked={selectedOption === 'Shipping'} onChange={handleOptionChange} value="Shipping" />}
           label="Shipping"
         />
        {currentLocation && <FormControlLabel
-          control={<Checkbox checked={selectedOption === 'Ship from Dealer'} onChange={handleOptionChange} value="Ship from Dealer" />}
+          control={<input type="radio" checked={selectedOption === 'Ship from Dealer'} onChange={handleOptionChange} value="Ship from Dealer" />}
           label="Ship from Dealer"
         />}
         {currentLocation &&
         <FormControlLabel
-          control={<Checkbox checked={selectedOption === 'Pickup from Dealer'} onChange={handleOptionChange} value="Pickup from Dealer" />}
+          control={<input type="radio" checked={selectedOption === 'Pickup from Dealer'} onChange={handleOptionChange} value="Pickup from Dealer" />}
           label="Pickup from Dealer"
         />
 }
