@@ -78,7 +78,7 @@ const AddressForm = () => {
         city: '',
         postalCode: '',
         state: '',
-        country: '', // Default to India
+        countryCode: 'IN', // Default to India
         phoneNumber: '',
         // isDefaultBilling: true,
         // defaultShippingAddress: false,
@@ -90,11 +90,13 @@ const AddressForm = () => {
             const response = await axios.get(`https://api.zippopotam.us/IN/${postalCode}`);
             if (response.data && response.data.places.length > 0) {
                 const { 'place name': city, state } = response.data.places[0];
+                const countryCode = response.data['country abbreviation']; // Correct country code field
+
                 setFormData({
                     ...formData,
                     city,
                     state,
-                    country: response.data.country,
+                    countryCode,
                     postalCode:postalCode 
                 });
             }
@@ -255,12 +257,12 @@ const AddressForm = () => {
                     />
                 </div>
                 <div className="block mb-2">
-                    <label className="text-muted-foreground">Country</label>
+                    <label className="text-muted-foreground">Country code</label>
                     <input
                         type="text"
                         name="country"
-                        value={formData.country}
-                        onChange={handleChange}
+                        value={formData.countryCode}
+                        // onChange={handleChange}
                         className="mt-1 block w-full rounded-md p-2 border border-border"
                         required
                     />

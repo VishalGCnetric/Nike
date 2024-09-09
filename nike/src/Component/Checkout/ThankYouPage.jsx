@@ -41,11 +41,11 @@ const ThankYouPage = () => {
     currencyCode,
     state,
     lines,
-    // shippingAddress,
-    // billingAddress,
+    shippingAddress,
+    billingAddress,
   } = orderData;
-  const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress'));
-  const billingAddress=JSON.parse(localStorage.getItem('shippingAddress'));
+//   const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress'));
+//   const billingAddress=JSON.parse(localStorage.getItem('shippingAddress'));
   return (
     <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg">
       {/* Thank You Header */}
@@ -128,7 +128,7 @@ const ThankYouPage = () => {
         {/* Shipping Address */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
-          <p className="font-bold mb-1">{shippingAddress?.firstName} {" "} {shippingAddress?.lastName}</p>
+          <p className="font-bold mb-1">{shippingAddress?.fullName} </p>
           <p>{shippingAddress.phoneNumber}</p>
           <p>{shippingAddress.streetLine1} {shippingAddress?.streetLine2}</p>
           <p>
@@ -141,7 +141,7 @@ const ThankYouPage = () => {
         {/* Billing Address */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Billing Address</h2>
-          <p className="font-bold mb-1">{billingAddress?.firstName} {" "} {billingAddress?.lastName}</p>          <p>{billingAddress?.phoneNumber}</p>
+          <p className="font-bold mb-1">{billingAddress?.fullName} </p>          <p>{billingAddress?.phoneNumber}</p>
           <p>{billingAddress?.streetLine1} {billingAddress?.streetLine2}</p>
           <p>
             {billingAddress?.city}, {billingAddress?.province}{' '}

@@ -32,6 +32,8 @@ const CartPage = () => {
   const confirmDelete = () => {
     dispatch(deleteCartItem(selectedItem));
     setOpenModal(false);
+    dispatch(fetchCart());
+
   };
 
   if (!token) {

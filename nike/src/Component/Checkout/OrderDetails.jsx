@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import ShopDetails from './ShopDetails';
 import { useNavigate } from 'react-router-dom';
+import ShippingDetails from './ShippingDetails';
 
 const sharedClasses = {
     textZinc: 'text-zinc-600 dark:text-zinc-400',
@@ -108,7 +109,8 @@ const OrderDetails = () => {
             <div className={sharedClasses.borderZinc}>
                 <p className="p-4 text-zinc-700 dark:text-zinc-300">Arrives {arrivalDate}</p>
             </div>
-           
+           <ShippingDetails/>
+
             <ShopDetails setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
             <div className="mt-6">
                
