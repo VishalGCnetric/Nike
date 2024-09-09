@@ -3,6 +3,7 @@ import { format } from 'date-fns'; // For date formatting
 import { useDispatch } from 'react-redux';
 import { getOrderDetails } from '../redux/slices/orders';
 import { useParams } from 'react-router-dom';
+import { QRCodeCanvas } from 'qrcode.react';
 
 const OrderDetails = () => {
   const [orderData, setOrderData] = useState(null);
@@ -49,8 +50,8 @@ const OrderDetails = () => {
     <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg">
       {/* Order Details Header */}
       <div className="flex flex-col md:flex-row justify-between items-start mb-6">
-        <h1 className="text-2xl font-bold">Order Details</h1>
         <div className="md:ml-4 mt-4 md:mt-0">
+          <h1 className="text-2xl font-bold">Order Details</h1>
           <h2 className="text-xl font-semibold">Order ID: {id}</h2>
           <p className="text-gray-700">
             Placed On:{' '}
@@ -59,13 +60,16 @@ const OrderDetails = () => {
           <p className="text-gray-700">
             Status:{' '}
             <span
-              className={`font-bold ${
-                state === 'Cancelled' ? 'text-red-600' : 'text-green-600'
-              }`}
+              className={`font-bold ${state === 'Cancelled' ? 'text-red-600' : 'text-green-600'
+                }`}
             >
               {state}
             </span>
           </p>
+        </div>
+        <div className="md:mr-4 mt-4 md:mt-0">
+          {/* QR code for the order ID */}
+          <QRCodeCanvas value={id} size={128} />
         </div>
       </div>
 
