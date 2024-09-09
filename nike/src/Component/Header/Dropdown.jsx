@@ -5,8 +5,8 @@ const Dropdown = ({ sections, dropdownFunction, dropDownName }) => {
   return (
     <div
      
-      onMouseEnter={() => dropdownFunction(dropDownName)}
-      onMouseLeave={() => dropdownFunction(null)}
+      // onMouseEnter={() => dropdownFunction(dropDownName)}
+      // onMouseLeave={() => dropdownFunction(null)}
       className="bg-white mt-8 rounded-lg shadow-lg w-full"
     >
       <div className="overflow-x-auto">

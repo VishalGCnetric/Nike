@@ -12,12 +12,27 @@ const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate()
 
-    const auth = JSON.parse(localStorage.getItem('auth'))
-   
-    const handleLogout =()=>{
-        localStorage.clear()
-    }
+    
+    const token = sessionStorage.getItem('token');
 
+    console.log(token)
+   
+    const handleLogout = () => {
+        // Clear localStorage
+        localStorage.clear();
+    
+        // Clear sessionStorage
+        sessionStorage.clear();
+    
+        // Clear cookies
+        document.cookie.split(";").forEach((cookie) => {
+            document.cookie = cookie
+                .split("=")[0]
+                .trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+        });
+    };
+    
+    
     return (
         <header className="bg-white shadow-sm">
 
@@ -33,7 +48,7 @@ const Navbar = () => {
                     <Link className="text-muted-foreground hover:text-primary">Find a Store</Link>
                     <Link className="text-muted-foreground hover:text-primary">Help</Link>
                     <Link className="text-muted-foreground hover:text-primary">Join Us</Link>
-                   {auth?<Link onClick={handleLogout}  className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Logout</Link>:<Link to='/auth/signin' className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Sign In</Link>} 
+                   {token?<Link onClick={handleLogout}  className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Logout</Link>:<Link to='/auth/signin' className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Sign In</Link>} 
                 </div>
             </nav>
             <div className="container mx-auto h-20 flex items-center justify-between px-2 lg:px-2">
