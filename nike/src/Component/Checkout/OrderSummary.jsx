@@ -33,10 +33,10 @@ const OrderSummary = () => {
     <div className={cardClass}>
       <h2 className="text-lg font-semibold text-zinc-800">Order Summary</h2>
       <div className="mt-4">
-        <p className={flexClass}><span>Subtotal</span><span>₹ {cart?.total.toLocaleString()||0}</span></p>
+        <p className={flexClass}><span>Subtotal</span><span>₹ {cart?.subtotal.toLocaleString()||0}</span></p>
         <p className={flexClass}><span>Delivery/Shipping</span><span>₹ {cart?.shipping||0}</span></p>
         <hr className="my-2" />
-        <p className={`${flexClass} font-bold`}><span>Total</span><span>₹ {(cart?.total + cart?.shipping||0).toLocaleString()}</span></p>
+        <p className={`${flexClass} font-bold`}><span>Total</span><span>₹ {(cart?.total || 0).toLocaleString()}</span></p>
       </div>
       <p className={`${itemClass} mt-1`}>(The total reflects the price of your order, including all duties and taxes)</p>
       {/* {step === 'payment' && (

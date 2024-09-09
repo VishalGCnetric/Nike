@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Tooltip, Polyline } from 'react-leafle
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
-import { Button, FormControlLabel, Modal, Box } from '@mui/material';
+import { Button, Checkbox, FormControlLabel } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -43,41 +43,82 @@ const ShopDetails = ({ selectedOption, setSelectedOption }) => {
   const [nearbyShops, setNearbyShops] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
   const [isContinueEnabled, setIsContinueEnabled] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { shippingAddress } = useSelector((state) => state.checkout);
-  const navigate = useNavigate();
-
+  const {shippingAddress}=useSelector((state)=>state.checkout)
+const navigate=useNavigate();
   useEffect(() => {
-    const savedShippingAddress = shippingAddress || JSON.parse(localStorage.getItem('shippingAddress'));
+    const savedShippingAddress =shippingAddress|| JSON.parse(localStorage.getItem('shippingAddress'));
     if (savedShippingAddress) {
       fetchCoordinates(savedShippingAddress);
     }
   }, []);
 
-  const fetchCoordinates = async (address) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentLocation({ lat: latitude, lng: longitude });
-        },
-        async (error) => {
-          console.error('Error fetching current location:', error);
-          await attemptAddressGeocoding(address);
+  const attemptAddressGeocoding = async (address) => {
+    const performGeocoding = async (query) => {
+      try {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
+        );
+        if (response.data.length > 0) {
+          const { lat, lon } = response.data[0];
+          setCurrentLocation({ lat: parseFloat(lat), lng: parseFloat(lon) });
+          return true;
         }
-      );
+        return false;
+      } catch (error) {
+        console.error('Error fetching geocode:', error);
+        return false;
+      }
+    };
+
+    let query = '';
+    if (address.streetLine1) {
+      query = `${address.streetLine1}, ${address.city}, ${address.state}, ${address.country}`;
+      const found = await performGeocoding(query);
+      if (found) return;
     }
+
+    if (address.streetLine2) {
+      query = `${address.streetLine2}, ${address.city}, ${address.state}, ${address.country}`;
+      const found = await performGeocoding(query);
+      if (found) return;
+    }
+
+    if (address.postalCode) {
+      query = `${address.postalCode}, ${address.city}, ${address.state}, ${address.country}`;
+      const found = await performGeocoding(query);
+      if (found) return;
+    }
+
+    toast.error('Address not found. Please opt for normal shipping.');
   };
 
-  const attemptAddressGeocoding = async (address) => {
-    // Function for geocoding
+  const fetchCoordinates = async (address) => {
+    if (address.defaultShippingAddress && address.isDefaultBilling) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setCurrentLocation({ lat: latitude, lng: longitude });
+          },
+          async (error) => {
+            console.error('Error fetching current location:', error);
+            await attemptAddressGeocoding(address);
+          }
+        );
+      } else {
+        toast.error('Geolocation is not supported by this browser.');
+        await attemptAddressGeocoding(address);
+      }
+    } else {
+      await attemptAddressGeocoding(address);
+    }
   };
 
   useEffect(() => {
     if (currentLocation) {
       const filteredShops = initialShops
-        .filter((shop) => shop.productID === 'P002')
-        .map((shop) => {
+        .filter(shop => shop.productID === 'P002')
+        .map(shop => {
           const distance = getDistanceFromLatLonInKm(
             currentLocation.lat,
             currentLocation.lng,
@@ -86,7 +127,7 @@ const ShopDetails = ({ selectedOption, setSelectedOption }) => {
           );
           return { ...shop, distance };
         })
-        .filter((shop) => shop.distance <= 100)
+        .filter(shop => shop.distance <= 100)
         .sort((a, b) => a.distance - b.distance);
 
       setNearbyShops(filteredShops);
@@ -99,20 +140,6 @@ const ShopDetails = ({ selectedOption, setSelectedOption }) => {
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
     setIsContinueEnabled(true);
-
-    if (event.target.value === 'Ship from Dealer' || event.target.value === 'Pickup from Dealer') {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleShopSelection = (shop) => {
-    setSelectedShop(shop);
-    setIsContinueEnabled(true);
-  };
-
-  const handleModalClose = () => {
-    localStorage.setItem('selectedShop', JSON.stringify(selectedShop));
-    setIsModalOpen(false);
   };
 
   return (
@@ -120,71 +147,71 @@ const ShopDetails = ({ selectedOption, setSelectedOption }) => {
       <ToastContainer />
       <div className="mt-2">
         <h3 className="text-md font-semibold">Choose a shipping method</h3>
-        <div className="flex flex-col pl-2 pt-2 gap-2">
-          <FormControlLabel
-            control={<input type="radio" checked={selectedOption === 'Shipping'} onChange={handleOptionChange} value="Shipping" />}
-            label="Shipping"
-          />
-          {currentLocation && (
-            <>
-              <FormControlLabel
-                control={<input type="radio" checked={selectedOption === 'Ship from Dealer'} onChange={handleOptionChange} value="Ship from Dealer" />}
-                label="Ship from Dealer"
-              />
-              <FormControlLabel
-                control={<input type="radio" checked={selectedOption === 'Pickup from Dealer'} onChange={handleOptionChange} value="Pickup from Dealer" />}
-                label="Pickup from Dealer"
-              />
-            </>
-          )}
+        <div className= "flex flex-row gap-2">
+        <FormControlLabel
+          control={<input type="radio" checked={selectedOption === 'Shipping'} onChange={handleOptionChange} value="Shipping" />}
+          label="Shipping"
+        />
+       {currentLocation && <FormControlLabel
+          control={<input type="radio" checked={selectedOption === 'Ship from Dealer'} onChange={handleOptionChange} value="Ship from Dealer" />}
+          label="Ship from Dealer"
+        />}
+        {currentLocation &&
+        <FormControlLabel
+          control={<input type="radio" checked={selectedOption === 'Pickup from Dealer'} onChange={handleOptionChange} value="Pickup from Dealer" />}
+          label="Pickup from Dealer"
+        />
+}
         </div>
       </div>
 
-      <Modal open={isModalOpen} onClose={handleModalClose}>
-        <Box className="modal-box">
-          <div className="flex">
-            <MapContainer center={[currentLocation?.lat, currentLocation?.lng]} zoom={8} style={{ height: '400px', width: '50%' }}>
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[currentLocation?.lat, currentLocation?.lng]} icon={shippingIcon}>
-                <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                  <strong>Your Location</strong>
-                </Tooltip>
-              </Marker>
-              {nearbyShops.map((shop) => (
-                <Marker key={shop.name} position={[shop?.lat, shop?.lng]} icon={shopIcon}>
-                  <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                    <strong>{shop.name}</strong><br />
-                    Distance: {shop.distance.toFixed(2)} km
-                  </Tooltip>
-                </Marker>
-              ))}
-            </MapContainer>
+      {currentLocation && (
+        <>
+          <MapContainer center={[currentLocation.lat, currentLocation.lng]} zoom={8} style={{ height: '400px', marginTop: '20px' }}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; OpenStreetMap contributors'
+            />
 
-            <div className="shop-list" style={{ width: '50%', padding: '20px', overflowY: 'auto' }}>
-              <h3>Select a Shop</h3>
-              {nearbyShops.map((shop) => (
-                <div
-                  key={shop.name}
-                  className={`shop-item ${selectedShop?.name === shop.name ? 'selected' : ''}`}
-                  onClick={() => handleShopSelection(shop)}
-                  style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ccc' }}
-                >
+            <Marker position={[currentLocation.lat, currentLocation.lng]} icon={shippingIcon}>
+              <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
+                <strong>Your Location</strong>
+              </Tooltip>
+            </Marker>
+
+            {nearbyShops.map((shop, index) => (
+              <Marker key={shop.name} position={[shop.lat, shop.lng]} icon={shopIcon}>
+                <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
                   <strong>{shop.name}</strong><br />
                   Distance: {shop.distance.toFixed(2)} km
-                </div>
-              ))}
-              <Button variant="contained" color="primary" onClick={handleModalClose} disabled={!selectedShop}>
-                Continue
-              </Button>
-            </div>
-          </div>
-        </Box>
-      </Modal>
+                </Tooltip>
+                {selectedShop && shop.name === selectedShop.name && (
+                  <Polyline positions={[[currentLocation.lat, currentLocation.lng], [shop.lat, shop.lng]]} color="blue" />
+                )}
+              </Marker>
+            ))}
+          </MapContainer>
 
-      {isContinueEnabled && (
-        <button   className="w-full bg-black text-white p-2 rounded-lg hover:bg-zinc-800 mt-4" onClick={() => navigate("/checkout/billing")}>
-          Continue
-        </button>
+          <h2>Nearest Shop:</h2>
+          {selectedShop ? (
+            <div>
+              <p><strong>{selectedShop.name}</strong></p>
+              <p>Distance: {selectedShop.distance.toFixed(2)} km</p>
+            </div>
+          ) : (
+            <p>No nearby shops found within the range of 100km.</p>
+          )}
+
+          <Button
+            variant="contained"
+            color="primary"
+            className="mt-2"
+            onClick={()=>navigate("/checkout/billing")}
+            // disabled={!isContinueEnabled}
+          >
+            Continue
+          </Button>
+        </>
       )}
     </div>
   );
