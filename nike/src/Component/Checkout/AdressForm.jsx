@@ -5,6 +5,65 @@ import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
+// Function to submit form data
+const submitAddressForm = (formData) => {
+  let data = JSON.stringify({
+    "address": {
+      "firstName": formData.firstName,
+      "lastName": formData.lastName,
+      "landmark": formData.landmark,
+      "streetLine1": formData.streetLine1,
+      "streetLine2": formData.streetLine2,
+      "city": formData.city,
+      "postalCode": formData.postalCode,
+      "countryCode": formData.countryCode,
+      "phoneNumber": formData.phoneNumber,
+      "state": formData.state,
+      "isDefaultBilling": formData.isDefaultBilling,
+      "isDefaultShipping": formData.isDefaultShipping
+    }
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${process.env.REACT_APP_BASE_URL}/me/addresses`,
+    headers: { 
+      'accesstoken':  sessionStorage.getItem('token'), 
+      'Content-Type': 'application/json'
+    },
+    data : data
+  };
+
+  // Sending the request
+  axios.request(config)
+  .then((response) => {
+    console.log('Response:', JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log('Error:', error);
+  });
+};
+
+// Example form data to submit
+// const formData = {
+//   firstName: "Raj",
+//   lastName: "Sharma",
+//   landmark: "Near Connaught Place",
+//   streetLine1: "15A Janpath",
+//   streetLine2: "Flat No. 402",
+//   city: "New Delhi",
+//   postalCode: "110001",
+//   countryCode: "IN",
+//   phoneNumber: "+91-9876543210",
+//   state: "Delhi",
+//   isDefaultBilling: true,
+//   isDefaultShipping: true
+// };
+
+// // Call the function with the form data
+// submitAddressForm(formData);
+
 const AddressForm = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -49,11 +108,13 @@ const AddressForm = () => {
         e.preventDefault();
 
         // Dispatch form data to Redux
-        dispatch(saveShippingAddress(formData));
+        dispatch(saveShippingAddress({...formData, isDefaultBilling: true,
+            defaultShippingAddress: isSameAsBilling,}));
 
         // Store form data in local storage
         localStorage.setItem('shippingAddress', JSON.stringify(formData));
-
+        submitAddressForm({...formData, isDefaultBilling: true,
+             defaultShippingAddress: isSameAsBilling,})
         // Update URL parameter to move to the next step (e.g., 'shipping')
         // setSearchParams({ step: 'shipping' });
 

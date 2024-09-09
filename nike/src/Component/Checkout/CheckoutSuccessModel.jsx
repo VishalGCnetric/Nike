@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutSuccessModal = ({ isVisible, onClose, orderId, expectedDelivery }) => {
+    const navigate = useNavigate();
+
+    // Use useEffect to handle redirection after 2 seconds
+    useEffect(() => {
+        if (isVisible) {
+            const timer = setTimeout(() => {
+                navigate(`/checkout/success/${orderId}`);
+            }, 2000);
+
+            return () => clearTimeout(timer); // Clean up the timer when modal unmounts or isVisible changes
+        }
+    }, [isVisible, orderId, navigate]);
+
     if (!isVisible) return null;
 
     return (

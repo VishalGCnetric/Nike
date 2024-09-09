@@ -108,7 +108,7 @@ const OrderDetails = () => {
             <div className={sharedClasses.borderZinc}>
                 <p className="p-4 text-zinc-700 dark:text-zinc-300">Arrives {arrivalDate}</p>
             </div>
-
+           
             <ShopDetails setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
             <div className="mt-6">
                
