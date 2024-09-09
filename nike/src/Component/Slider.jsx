@@ -62,7 +62,7 @@ const PopularShoes = ({data}) => {
                 </div>
                 <div>
                     <button className='border rounded-full mr-2 h-10 w-10' onClick={scrollLeft}><IoIosArrowBack className='h-10 w-10 '/></button>
-                    <button className='border rounded-full' onClick={scrollRight}><IoIosArrowForward/></button>
+                    <button className='border rounded-full mr-2 h-10 w-10' onClick={scrollRight}><IoIosArrowForward className='h-10 w-10 '/></button>
                 </div>
             </div>
             <div className="overflow-x-scroll" ref={scrollContainerRef}>

@@ -5,27 +5,48 @@ import SlickSliderComponent from '../Component/Swiper'
 import axios from 'axios'
 import ShoppingLoader from '../Component/Loader/ShoppingLoader'
 
+const api = process.env.REACT_APP_BASE_URL;
+
 const Homepage = () => {
-  const [loading,setLoading] = useState(false)
-  const [data,setData] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);  // State to handle errors
 
-  useEffect(()=>{
-    const fetchData =async()=>{
-      setLoading(true)
-      const response = await axios.get('http://106.51.242.196:50102/content')
-      setData(response.data)
-      setLoading(false)
-    }
-    
-    fetchData()
-  },[])
-  const popularProductSliders = data.filter(image => image.title.includes('popular product slider'));
-  const thepopularSpotlight = data.filter(image => image.title.includes('the popular spotlight'));
-  const mainImage = data.filter(image => image.title.includes('main banner'));
-  const latestImage = data.filter(image => image.title.includes('the latest'));
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);  // Clear any previous errors
+      try {
+        const response = await axios.get(`${api}/content`);
+        setData(response.data);
+      } catch (err) {
+        setError('Failed to fetch data. Please check your connection.');
+        
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if(loading){
-    return <ShoppingLoader/>
+    fetchData();
+  }, []);
+
+  const popularProductSliders = data?.filter(image => image.title.includes('popular product slider'));
+  const thepopularSpotlight = data?.filter(image => image.title.includes('the popular spotlight'));
+  const mainImage = data?.filter(image => image.title.includes('main banner'));
+  const latestImage = data?.filter(image => image.title.includes('the latest'));
+
+  if (loading) {
+    return <ShoppingLoader />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-red-100 text-red-600 p-4 rounded">
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -53,57 +74,50 @@ const Homepage = () => {
         <SlickSliderComponent data={thepopularSpotlight} />
       </div>
       <div className="container w-full mx-auto px-2 py-8">
-      <h2 className="text-3xl font-bold mb-6">The Latest</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        {/* Card 1 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
-          <img
-            src={latestImage?.[0]?.url}
-            alt="Nike Zenvy Collection"
-            className="w-full h-full object-cover"
-          />
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Nike Zenvy Collection</h3>
-            <a href="#" className="text-primary hover:underline">
-              Shop Now
-            </a>
+        <h2 className="text-3xl font-bold mb-6">The Latest</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {/* Card 1 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+            <img
+              src={latestImage?.[0]?.url}
+              alt="Nike Zenvy Collection"
+              className="w-full h-full object-cover"
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-semibold mb-2">Nike Zenvy Collection</h3>
+              <a href="#" className="text-primary hover:underline">
+                Shop Now
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Card 2 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
-          <img
-          src={latestImage?.[1]?.url}
-            alt="Kylian Mbappé Mercurial"
-            className="w-full h-full object-cover"
-          />
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Kylian Mbappé Mercurial</h3>
-            <a href="#" className="text-primary hover:underline">
-              Shop Now
-            </a>
+          {/* Card 2 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+            <img
+              src={latestImage?.[1]?.url}
+              alt="Kylian Mbappé Mercurial"
+              className="w-full h-full object-cover"
+            />
+            <div className="p-4">
+              <h3 className="text-xl font-semibold mb-2">Kylian Mbappé Mercurial</h3>
+              <a href="#" className="text-primary hover:underline">
+                Shop Now
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Card 3 */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
-          <img
-            src={latestImage?.[2]?.url}
-            alt="Train Like LeBron in the TR1"
-            className="w-full h-full object-cover"
-          />
-          {/* <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Train Like LeBron in the TR1</h3>
-            <a href="#" className="text-primary hover:underline">
-              Shop Now
-            </a>
-          </div> */}
+          {/* Card 3 */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105">
+            <img
+              src={latestImage?.[2]?.url}
+              alt="Train Like LeBron in the TR1"
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       </div>
     </div>
-    </div>
+  );
+};
 
-  )
-}
-
-export default Homepage
+export default Homepage;

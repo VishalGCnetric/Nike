@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 const SlickSliderComponent = ({data}) => {
   const sliderRef = useRef(null);
@@ -68,15 +69,15 @@ const SlickSliderComponent = ({data}) => {
     </Slider>
     <button
       onClick={() => sliderRef.current.slickPrev()}
-      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black text-white p-2 rounded md:left-2 lg:left-4 xl:left-6"
+      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white text-black p-2 rounded md:left-2 lg:left-4 xl:left-6"
     >
-      Prev
+      <IoIosArrowBack  className='h-10 w-10 '/>
     </button>
     <button
       onClick={() => sliderRef.current.slickNext()}
-      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black text-white p-2 rounded md:right-2 lg:right-4 xl:right-6"
+      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white text-black p-2 rounded md:right-2 lg:right-4 xl:right-6"
     >
-      Next
+      <IoIosArrowForward className='h-10 w-10 '/>
     </button>
   </div>
 </div>

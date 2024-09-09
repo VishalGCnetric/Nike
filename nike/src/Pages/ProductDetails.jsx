@@ -166,13 +166,15 @@ const ProductDetails = () => {
                             />
                             {/* Display selected variant details */}
                             {variantData && (
-                                <div className="mt-4 flex items-center">
+                                <div className="mt-4  items-center">
                                     {variantData.attributes.color?.split('/').map((color, index) => (
                                         <span key={index} className="mr-2 px-2 py-1 border rounded text-sm">
                                             {color}
                                         </span>
                                     ))}
-                                    <span className="ml-4">{variantData.attributes.size || variantData.attributes.Size || 'No size specified'}</span>
+                                    <div className="ml-4"><b>Size: </b>{variantData.attributes.size || variantData.attributes.Size || 'No size specified'}</div>
+                                    
+                                    <div className="ml-4"><b>Color: </b>{variantData.attributes.color || variantData.attributes.Color || 'No size specified'}</div>
                                 </div>
                             )}
                             <button onClick={handleAddToCart} className="w-full bg-black text-white py-3 rounded">Add to Bag</button>
