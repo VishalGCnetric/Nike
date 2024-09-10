@@ -1,19 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button } from "@mui/material";
 import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import axios from "axios";
 import ShopCartList from "./ShopCartList";
+import Maps from "./Maps";
 import ShopCart from "./ShopCart";
 
 // Custom marker icon
-const customIcon = new L.Icon({
-  iconUrl: 'https://example.com/path-to-custom-icon.png', // Replace with actual path to the icon
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/images/marker-shadow.png',
-  shadowSize: [41, 41],
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
 const ShopSelectionModal = ({
@@ -23,6 +23,52 @@ const ShopSelectionModal = ({
   nearbyShops = [],
   onSelectShop,
 }) => {
+  const [address, setAddress] = useState('');
+  const [error, setError] = useState('');
+  const [selectedShops, setSelectedShops] = useState({}); // Track selected shop per variant
+
+  useEffect(() => {
+    if (coordinates) {
+      const fetchAddress = async () => {
+        try {
+          const response = await axios.get(
+            `https://nominatim.openstreetmap.org/reverse?lat=${coordinates.lat}&lon=${coordinates.lng}&format=json`
+          );
+          setAddress(response.data.display_name);
+        } catch (err) {
+          setError('Unable to fetch address');
+        }
+      };
+
+      fetchAddress();
+    }
+  }, [coordinates]);
+
+  // Handle shop selection and update local storage
+  const handleSelectShop = (variantName, shop) => {
+    // Update selected shop for the variant
+    const updatedSelection = {
+      ...selectedShops,
+      [variantName]: shop,
+    };
+
+    setSelectedShops(updatedSelection);
+
+    // Store the selected shops in local storage
+    localStorage.setItem("selectedShops", JSON.stringify(updatedSelection));
+
+    // You can call onSelectShop to handle further actions outside the component
+    if (onSelectShop) {
+      onSelectShop(updatedSelection);
+    }
+  };
+
+  // Fetch selected shops from localStorage on component mount
+  useEffect(() => {
+    const storedSelection = JSON.parse(localStorage.getItem("selectedShops")) || {};
+    setSelectedShops(storedSelection);
+  }, []);
+
   return (
     <Modal open={isOpen} onClose={onClose} className="flex items-center justify-center">
       <div className="bg-white rounded-lg p-5 w-full max-w-5xl mx-auto max-h-[90vh] overflow-auto">
@@ -30,31 +76,9 @@ const ShopSelectionModal = ({
           {/* Left side: Map */}
           <div className="w-full sm:w-1/2 h-full mb-5 sm:mb-0">
             {coordinates ? (
-              <MapContainer center={coordinates} zoom={13} scrollWheelZoom={false} className="h-96 w-full rounded">
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                
-                {/* Current Location Marker */}
-                <Marker position={[coordinates.lat, coordinates.lng]} icon={customIcon}>
-                  <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                    <strong>Your Location</strong>
-                  </Tooltip>
-                </Marker>
-
-                {/* Nearby Shops Markers */}
-                {nearbyShops.length > 0 ? (
-                  nearbyShops.map((shop) => (
-                    <Marker key={shop.sellerId} position={[shop.lat, shop.lng]}>
-                      <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                        <strong>{shop.sellerName}</strong>
-                      </Tooltip>
-                    </Marker>
-                  ))
-                ) : (
-                  <p>No shops available nearby.</p>
-                )}
-              </MapContainer>
+              <Maps currentLocation={coordinates} nearbyShops={nearbyShops} />
             ) : (
-              <p>Loading shop...</p>
+              <p>Loading map...</p>
             )}
           </div>
 
@@ -63,12 +87,28 @@ const ShopSelectionModal = ({
             <h2 className="text-xl font-semibold mb-4">Select a Shop</h2>
             {nearbyShops.length > 0 ? (
               nearbyShops.map((shop) => (
-                <div key={shop.sellerId} className="mb-4 p-4 border rounded-lg cursor-pointer" onClick={() => onSelectShop(shop)}>
-                  <h3 className="text-lg font-semibold">{shop.sellerName}</h3>
-                  <p>Price: ₹{shop.price}</p>
-                  <Button variant="contained" color="primary">
-                    Select
-                  </Button>
+                <div
+                  key={shop.variantName}
+                  className="mb-4 p-4 border rounded-lg cursor-pointer"
+                >
+                  <h1>{shop.variantName}</h1>
+                  {shop.sellers?.map((seller) => (
+                    <div key={seller.sellerId}>
+                      <ShopCart shop={seller} />
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleSelectShop(shop.variantName, seller)}
+                      >
+                        Select
+                      </Button>
+
+                      {/* Display the currently selected shop for the variant */}
+                      {selectedShops[shop.variantName]?.sellerId === seller.sellerId && (
+                        <p className="text-green-500 mt-2">Selected</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))
             ) : (
