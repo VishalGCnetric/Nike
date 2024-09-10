@@ -85,40 +85,9 @@ const ShopSelectionModal = ({
           {/* Right side: List of shops */}
           <div className="w-full sm:w-1/2 pl-0 sm:pl-6 overflow-y-auto max-h-96">
             <h2 className="text-xl font-semibold mb-4">Select a Shop</h2>
-            {nearbyShops.length > 0 ? (
-              nearbyShops.map((shop) => (
-                <div
-                  key={shop.variantName}
-                  className="mb-4 p-4 border rounded-lg cursor-pointer"
-                >
-                  <h1>{shop.variantName}</h1>
-                  {shop.sellers?.map((seller) => (
-                    <div key={seller.sellerId}>
-                      <ShopCart shop={seller} />
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleSelectShop(shop.variantName, seller)}
-                      >
-                        Select
-                      </Button>
-
-                      {/* Display the currently selected shop for the variant */}
-                      {selectedShops[shop.variantName]?.sellerId === seller.sellerId && (
-                        <p className="text-green-500 mt-2">Selected</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))
-            ) : (
-              <div className="overflow-y-auto">
-                <p>No shops available nearby.</p>
-                <ShopCartList />
-              </div>
-            )}
-          </div>
-        </div>
+            <ShopCartList shop={nearbyShops}/>
+</div>
+      </div>
       </div>
     </Modal>
   );

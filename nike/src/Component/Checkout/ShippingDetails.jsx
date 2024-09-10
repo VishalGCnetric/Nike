@@ -120,6 +120,8 @@ console.log(locationGranted,browserCoordinates);
   
         if (nearbySellers.length) {
           acc.push({
+            sku:variant.sku,
+            variantId: variant.variantId,
             variantName: variant.variantName,
             sellers: nearbySellers,
           });
