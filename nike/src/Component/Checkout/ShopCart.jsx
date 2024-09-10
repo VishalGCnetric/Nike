@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const ShopCart = ({ shop }) => {
-  const position = [shop.coordinates.lat, shop.coordinates.lng];
+  const position = [+shop.coordinates.lat, +shop.coordinates.lng];
 
   return (
     <div className="border border-gray-200 p-6 rounded-lg shadow-md mb-8">

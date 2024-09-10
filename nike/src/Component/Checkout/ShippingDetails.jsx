@@ -16,7 +16,7 @@ const shop = {
           sellerId: "3",
           sellerName: "Sneakersnstuff",
           price: 1149500,
-          coordinates: { lat: 18.2591827, lng: 76.1773209 },
+          coordinates: { lat: 76.6326324, lng: 18.2604291 },
           mapLink: "https://maps.app.goo.gl/ginWn95sFEK5PWKF8",
         },
       ],
@@ -30,14 +30,15 @@ const shop = {
           sellerId: "2",
           sellerName: "Dev Logistics",
           price: 274750,
-          coordinates: { lat: 18.563636, lng: 76.214588 },
+          coordinates: { lat: 75.7326324, lng: 18.2604291 }
+          ,
           mapLink: "https://www.google.com/maps/place/Chandni+Chowk,+Delhi/@28.6513747,77.2316374,15z/",
         },
         {
           sellerId: "5",
           sellerName: "Finish Line",
           price: 549500,
-          coordinates: { lat: 18.409984, lng: 76.577656 },
+          coordinates: { lat: 76.1826324, lng: 18.7304291 },
           mapLink: "https://maps.app.goo.gl/tSQsEzQzpZca7uZc6",
         },
       ],
@@ -69,10 +70,16 @@ const ShippingDetails = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocationGranted(true);
+        // setPosition([18.2604291, 76.1826324]);
+
         setBrowserCoordinates({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+            lng:18.2604291,
+            lat:76.1826324
         });
+
+        //   lat: position.coords.latitude,
+        //   lng: position.coords.longitude,
+        // });
       },
       (error) => {
         switch (error.code) {
@@ -102,14 +109,15 @@ console.log(locationGranted,browserCoordinates);
       const shopsWithin50km = shop?.data?.reduce((acc, variant) => {
         const nearbySellers = variant.sellers.filter((seller) => {
           const distance = calculateDistance(
-            browserCoordinates?.lat,
-            browserCoordinates?.lng,
-            seller.coordinates?.lat,
-            seller.coordinates?.lng
+            browserCoordinates.lat,
+            browserCoordinates.lng,
+            seller.coordinates.lat,
+            seller.coordinates.lng
           );
-          return distance <= 50;
+          console.log(`Distance from user to seller (${seller.sellerName}): ${distance} km`);
+          return distance <= 51;
         });
-
+  
         if (nearbySellers.length) {
           acc.push({
             variantName: variant.variantName,
@@ -121,19 +129,24 @@ console.log(locationGranted,browserCoordinates);
       setNearbyShops(shopsWithin50km);
     }
   }, [browserCoordinates]);
+  
 
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of Earth in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    const distance = R * c; // Distance in km
+    return distance;
   };
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
 
   // Attempt address geocoding
   const attemptAddressGeocoding = async (address) => {
@@ -144,7 +157,7 @@ console.log(locationGranted,browserCoordinates);
         );
         if (response.data.length > 0) {
           const { lat, lon } = response.data[0];
-          setShippingCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
+          setBrowserCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
           return true;
         }
         return false;
@@ -204,7 +217,7 @@ console.log(locationGranted,browserCoordinates);
     setShowShippingPopup(false);
     setIsModalOpen(true);
   };
-
+console.log(nearbyShops)
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Shipping Details</h1>
@@ -222,7 +235,7 @@ console.log(locationGranted,browserCoordinates);
       <ShopSelectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        coordinates={browserCoordinates || shippingCoordinates}
+        coordinates={browserCoordinates }
         nearbyShops={nearbyShops}
         onSelectShop={handleShopSelection}
       />
