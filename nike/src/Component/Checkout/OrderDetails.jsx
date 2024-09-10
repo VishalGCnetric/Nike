@@ -111,7 +111,7 @@ const OrderDetails = () => {
                 <p className="p-4 text-zinc-700 dark:text-zinc-300">Arrives {arrivalDate}</p>
             </div>
            <ShippingDetails/>
-<LocationMap/>
+{/* <LocationMap/> */}
             {/* <ShopDetails setSelectedOption={setSelectedOption} selectedOption={selectedOption}/> */}
             <div className="mt-6">
                

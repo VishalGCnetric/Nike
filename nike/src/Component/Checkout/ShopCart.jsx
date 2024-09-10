@@ -23,8 +23,8 @@ const ShopCart = ({ shop, onClick }) => {
           <p className="text-lg text-gray-700 font-medium">
             Price: <span className="text-green-600">₹{shop.price}</span>
           </p>
-          <a href={shop.mapLink} target="_blank" rel="noopener noreferrer" className="mt-4 inline-block px-6 py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-lg transition duration-300 ease-in-out">
-            View on GoogleMap
+          <a href={shop.mapLink} target="_blank" rel="noopener noreferrer" className="mt-4 text-xs inline-block px-2 py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-lg transition duration-300 ease-in-out">
+            View on Google Maps
           </a>
         </div>
       </div>
