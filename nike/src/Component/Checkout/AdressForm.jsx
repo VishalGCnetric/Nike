@@ -38,7 +38,7 @@ const submitAddressForm = (formData) => {
   // Sending the request
   axios.request(config)
   .then((response) => {
-    console.log('Response:', JSON.stringify(response.data));
+    // console.log('Response:', JSON.stringify(response.data));
   })
   .catch((error) => {
     console.log('Error:', error);
