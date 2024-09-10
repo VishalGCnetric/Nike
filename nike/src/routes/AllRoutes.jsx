@@ -13,6 +13,7 @@ import ProfilePage from '../Pages/Profile'
 import OrderList from '../Pages/OrderList'
 import OrderDetails from '../Pages/OrderDetails'
 import ThankYouPage from '../Component/Checkout/ThankYouPage'
+import FindLocation from '../Pages/FindLocation'
 
 const Checkout = lazy(() => import('../Pages/Checkout'));
 
@@ -27,6 +28,7 @@ const AllRoutes = () => {
 
        <Route path='/' element={<Homepage/>}/>
        <Route path='/cart' element={<CartPage/>}/>
+       <Route path='/location' element={<FindLocation/>}/>
 
        <Route path='/product/:id' element={<ProductDetails/>}/>
        <Route path= "/checkout/orderSummary" element={<Order/>}/>
