@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DeliveryInformation from './DeliveryInformation';
+import ShopCart from './ShopCart';
 
 // Shared Tailwind CSS classes
 const twClasses = {
@@ -15,28 +16,75 @@ const twClasses = {
 };
 
 const BillingComponent = () => {
-                  const navigate=useNavigate();
+  const navigate = useNavigate();
+  
+  // Retrieve data from localStorage
+  const data = JSON.parse(localStorage.getItem("selectedShippingDealers")) || [];
+  
+  // If there's data in localStorage, show the selected shipping dealers
+  if (data.length > 0) {
+    return (
+      <div className="container mx-auto p-4">
+        <h2 className="text-2xl font-semibold mb-6">Selected Shipping Dealers</h2>
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+          {data.map((variant) => (
+            <div
+              key={variant.variantId}
+              className="border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300"
+            >
+              <h3 className="text-xl font-medium text-gray-800 mb-2">
+                {variant.variantName}
+              </h3>
+              <p className="text-sm text-gray-600">SKU: {variant.sku}</p>
 
+              <div className="mt-4 ">
+                {variant.sellers.map((seller) => (
+                  <ShopCart shop={seller}/>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+        onClick={() => { navigate("/checkout/payment") }}
+        className="w-full mt-6 bg-black text-white mb-5 py-3 rounded-lg hover:bg-gray-800"
+      >
+        Continue
+      </button>
+        <div className={twClasses.border}></div>
+      <div>
+        <h3 className={twClasses.subHeader}>Billing</h3>
+        <p className={twClasses.content}>Details here...</p>
+      </div>
+      <div className={twClasses.border}></div>
+      <div>
+        <h3 className={twClasses.subHeader}>Payment</h3>
+        <p className={twClasses.content}>Details here...</p>
+      </div>
+     
+      </div>
+    );
+  }
+
+  // Show normal UI if no data is available
   return (
     <div className={twClasses.container}>
       <h2 className={twClasses.header}>What's your billing address?</h2>
-      <div className='flex items-center my-4'>
-        <input type='checkbox' id='billingMatches' className='mr-2' defaultChecked />
-        <label htmlFor='billingMatches' className={twClasses.checkboxLabel}>Billing matches shipping address</label>
+      <div className="flex items-center my-4">
+        <input type="checkbox" id="billingMatches" className="mr-2" defaultChecked />
+        <label htmlFor="billingMatches" className={twClasses.checkboxLabel}>
+          Billing matches shipping address
+        </label>
       </div>
-      <button                  onClick={()=>{navigate("/checkout/payment")}}
-          className="w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
-      >Continue</button>
+      <button
+        onClick={() => { navigate("/checkout/payment") }}
+        className="w-full mt-6 bg-black text-white py-3 rounded-lg hover:bg-gray-800"
+      >
+        Continue
+      </button>
       <div className={twClasses.border}></div>
       <div>
-        {/* <h3 className={twClasses.subHeader}>Delivery</h3>
-        <p className={twClasses.content}>Vishal Giri</p>
-        <p className={twClasses.content}>At post Irla</p>
-        <p className={twClasses.content}>vishal@centric.com</p>
-        <p className={twClasses.content}>097671 76108</p>
-        <p className={twClasses.content}>PAN</p>
-        <button className={twClasses.editButton}>Edit</button> */}
-        <DeliveryInformation/>
+        <DeliveryInformation />
       </div>
       <div className={twClasses.border}></div>
       <div>
