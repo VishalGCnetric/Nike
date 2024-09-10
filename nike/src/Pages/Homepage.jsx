@@ -4,6 +4,7 @@ import Slider from '../Component/Slider'
 import SlickSliderComponent from '../Component/Swiper'
 import axios from 'axios'
 import ShoppingLoader from '../Component/Loader/ShoppingLoader'
+import FindingDealerLoader from '../Component/Loader/FindingDealerLoader'
 
 const api = process.env.REACT_APP_BASE_URL;
 
@@ -38,6 +39,7 @@ const Homepage = () => {
   if (loading) {
     return <ShoppingLoader />;
   }
+
 
   if (error) {
     return (
