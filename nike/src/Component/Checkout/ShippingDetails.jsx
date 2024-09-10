@@ -4,25 +4,68 @@ import { Button, Modal, RadioGroup, Radio, FormControlLabel } from '@mui/materia
 import { toast } from 'react-toastify'; // For toast notifications
 import axios from 'axios'; // For geocoding requests
 import ShopSelectionModal from './ShopSelectionModal'; // Custom modal for shop selection
-import { shop } from './shop'; // Assuming the shop data is imported
-// pick from deler use current location cordinate to  check the shop
-// ship from deler use popup to ask shipping and current is same or not 
-// if same  then use current location
-// if not fetch cordinate using the shipping address.
+
+const shop = {
+  data: [
+    {
+      variantId: "107",
+      variantName: "Air Jordan 1 Low SE Brown/Sail/Neutral Grey/Archaeo Brown",
+      sku: "HF1567-200",
+      sellers: [
+        {
+          sellerId: "3",
+          sellerName: "Sneakersnstuff",
+          price: 1149500,
+          coordinates: { lat: 18.2591827, lng: 76.1773209 },
+          mapLink: "https://maps.app.goo.gl/ginWn95sFEK5PWKF8",
+        },
+      ],
+    },
+    {
+      variantId: "150",
+      variantName: "Jordan Artist Series By Darien Birks Dark Smoke Grey",
+      sku: "HF5470-070",
+      sellers: [
+        {
+          sellerId: "2",
+          sellerName: "Dev Logistics",
+          price: 274750,
+          coordinates: { lat: 18.563636, lng: 76.214588 },
+          mapLink: "https://www.google.com/maps/place/Chandni+Chowk,+Delhi/@28.6513747,77.2316374,15z/",
+        },
+        {
+          sellerId: "5",
+          sellerName: "Finish Line",
+          price: 549500,
+          coordinates: { lat: 18.409984, lng: 76.577656 },
+          mapLink: "https://maps.app.goo.gl/tSQsEzQzpZca7uZc6",
+        },
+      ],
+    },
+  ],
+};
+
 const ShippingDetails = () => {
   const [locationGranted, setLocationGranted] = useState(false);
   const [browserCoordinates, setBrowserCoordinates] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('shipping');
   const [selectedShop, setSelectedShop] = useState(null);
-  const [nearbyShops, setNearbyShops] = useState([]); // Stores shops within 50km
+  const [nearbyShops, setNearbyShops] = useState([]);
   const [shippingCoordinates, setShippingCoordinates] = useState(null);
+  const [showShippingPopup, setShowShippingPopup] = useState(false);
 
-  // Get shipping data from the Redux store
-  const shippingData = useSelector(state => state.checkout.shippingAddress) || JSON.parse(localStorage.getItem('shippingAddress')); // Assuming address is in the Redux store
+  // Get shipping data from Redux store or localStorage
+  const shippingData = useSelector(state => state.checkout.shippingAddress) || JSON.parse(localStorage.getItem('shippingAddress'));
+
   // Request browser location permission
   useEffect(() => {
-    // if(shippingData.isDefaultShipping){
+    const geoOptions = {
+      enableHighAccuracy: true, // More accurate, but drains battery
+      timeout: 10000, // Timeout in 10 seconds
+      maximumAge: 0,  // Do not use cached position
+    };
+  
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocationGranted(true);
@@ -32,27 +75,49 @@ const ShippingDetails = () => {
         });
       },
       (error) => {
-        console.log('Permission denied', error);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            console.log('User denied the request for Geolocation.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            console.log('Location information is unavailable.');
+            break;
+          case error.TIMEOUT:
+            console.log('The request to get user location timed out.');
+            break;
+          default:
+            console.log('An unknown error occurred.');
+            break;
+        }
         setLocationGranted(false);
-      }
+      },
+      geoOptions
     );
-// }else{
-//     attemptAddressGeocoding(shippingData)
-// }
   }, []);
-
+  
+console.log(locationGranted,browserCoordinates);
   // Fetch nearby shops based on browser coordinates
   useEffect(() => {
     if (browserCoordinates) {
-      const shopsWithin50km = shop?.data?.filter((s) => {
-        const distance = calculateDistance(
-          browserCoordinates?.lat,
-          browserCoordinates?.lng,
-          s.coordinates?.lat,
-          s.coordinates?.lng
-        );
-        return distance <= 50;
-      });
+      const shopsWithin50km = shop?.data?.reduce((acc, variant) => {
+        const nearbySellers = variant.sellers.filter((seller) => {
+          const distance = calculateDistance(
+            browserCoordinates?.lat,
+            browserCoordinates?.lng,
+            seller.coordinates?.lat,
+            seller.coordinates?.lng
+          );
+          return distance <= 50;
+        });
+
+        if (nearbySellers.length) {
+          acc.push({
+            variantName: variant.variantName,
+            sellers: nearbySellers,
+          });
+        }
+        return acc;
+      }, []);
       setNearbyShops(shopsWithin50km);
     }
   }, [browserCoordinates]);
@@ -89,7 +154,6 @@ const ShippingDetails = () => {
       }
     };
 
-    // Prioritize geocoding attempts
     const geocodePriorities = [
       `${address.streetLine1}, ${address.city}, ${address.state}, ${address.country}`,
       `${address.streetLine2}, ${address.city}, ${address.state}, ${address.country}`,
@@ -109,12 +173,17 @@ const ShippingDetails = () => {
     const value = event.target.value;
     setSelectedOption(value);
 
-    // For "Pick from dealer" or "Ship from dealer", attempt to geocode address or use browser location
-    if (value === 'pick' || value === 'ship') {
+    if (value === 'pick') {
+      if (browserCoordinates) {
+        setIsModalOpen(true);
+      } else {
+        toast.error('Unable to get current location. Please enable location services.');
+      }
+    } else if (value === 'ship') {
       if (!browserCoordinates && shippingData) {
         await attemptAddressGeocoding(shippingData);
       }
-      setIsModalOpen(true);
+      setShowShippingPopup(true);
     }
   };
 
@@ -124,10 +193,22 @@ const ShippingDetails = () => {
     setIsModalOpen(false);
     localStorage.setItem("selectedShop", JSON.stringify(shop));
   };
+
+  // Handle shipping confirmation
+  const handleShippingConfirmation = async (useCurrentLocation) => {
+    if (useCurrentLocation) {
+      setShippingCoordinates(browserCoordinates);
+    } else if (shippingData) {
+      await attemptAddressGeocoding(shippingData);
+    }
+    setShowShippingPopup(false);
+    setIsModalOpen(true);
+  };
+
   return (
-    <div>
-      <h1>Shipping Details</h1>
-      {/* Shipping or picking options */}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Shipping Details</h1>
+      
       <RadioGroup value={selectedOption} onChange={handleOptionChange}>
         <FormControlLabel value="shipping" control={<Radio />} label="Ship to my address" />
         {locationGranted && (
@@ -138,7 +219,6 @@ const ShippingDetails = () => {
         )}
       </RadioGroup>
 
-      {/* Modal for selecting shop */}
       <ShopSelectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -147,13 +227,22 @@ const ShippingDetails = () => {
         onSelectShop={handleShopSelection}
       />
 
-      {/* Show continue button if shop is selected */}
-      <Button 
-        variant="contained" 
-        color="primary" 
+      <Modal open={showShippingPopup} onClose={() => setShowShippingPopup(false)} className="flex align-center justify-center">
+        <div className="mt-[18%] p-6 bg-white rounded-md w-1/2 h-[150px] text-center">
+          <h2 className="text-xl font-bold">Shipping Confirmation</h2>
+          <p>Is your shipping address the same as your current location?</p>
+          <div className="flex justify-center gap-4 mt-4">
+            <Button variant="contained" color="primary" onClick={() => handleShippingConfirmation(true)}>Yes</Button>
+            <Button variant="contained" color="error" onClick={() => handleShippingConfirmation(false)}>No</Button>
+          </div>
+        </div>
+      </Modal>
+
+      <button 
+        className="w-full bg-black text-white p-2 rounded-lg hover:bg-zinc-800"
         disabled={!selectedShop && selectedOption !== 'shipping'}>
         Continue
-      </Button>
+      </button>
     </div>
   );
 };

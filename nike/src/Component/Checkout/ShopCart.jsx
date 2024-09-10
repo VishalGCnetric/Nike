@@ -15,7 +15,7 @@ const ShopCart = ({ shop }) => {
           <MapContainer center={position} zoom={13} scrollWheelZoom={false} className="h-full w-full">
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='&copy;  '
             />
             <Marker position={position}>
               <Popup>
@@ -36,7 +36,7 @@ const ShopCart = ({ shop }) => {
           rel="noopener noreferrer"
           className="mt-4 inline-block px-6 py-2 text-white bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-lg transition duration-300 ease-in-out"
         >
-          View on OpenStreetMap
+          View on GoogleMap
         </a>
         </div>
       </div>

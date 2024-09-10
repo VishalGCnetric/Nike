@@ -75,11 +75,16 @@ const CartPage = () => {
               <h2 className="text-xl font-semibold mb-4">Summary</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal:</span>
-                <span>₹ {cart?.total.toLocaleString()}</span>
+                <span>₹ {cart?.subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span>Total Quantity:</span>
-                <span>{cart?.totalQuantity}</span>
+                <span>shipping: </span>
+                <span>₹ {cart?.shipping.toLocaleString()}</span>
+              </div>
+              <hr/>
+              <div className="flex justify-between mb-2">
+                <span>Total :</span>
+                <span>₹ {cart?.total.toLocaleString()}</span>
               </div>
               <button
                 onClick={() => navigate('/checkout/address')}
