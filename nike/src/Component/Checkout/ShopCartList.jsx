@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ShopCart from "./ShopCart"; // Ensure you import the ShopCart component
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -10,8 +10,8 @@ const ShopCartList = ({ shop }) => {
 
   // Handle seller selection when a card is clicked
   const handleSelectSeller = (variantId, sellerId) => {
-    const selectedVariant = shop?.find(v => v.variantId === variantId);
-    const selectedSeller = selectedVariant.sellers.find(s => s.sellerId === sellerId);
+    const selectedVariant = shop?.find((v) => v.variantId === variantId);
+    const selectedSeller = selectedVariant.sellers.find((s) => s.sellerId === sellerId);
 
     setSelectedSellers((prevSelected) => ({
       ...prevSelected,
@@ -19,10 +19,34 @@ const ShopCartList = ({ shop }) => {
     }));
   };
 
+  // Automatically select default sellers based on the number of sellers or distance
+  useEffect(() => {
+    shop?.forEach((variant) => {
+      if (!selectedSellers[variant.variantId]) {
+        if (variant.sellers.length === 1) {
+          // If only one seller, select it by default
+          setSelectedSellers((prevSelected) => ({
+            ...prevSelected,
+            [variant.variantId]: variant.sellers[0],
+          }));
+        } else if (variant.sellers.length > 1) {
+          // If multiple sellers, select the one with the minimum distance
+          const closestSeller = variant.sellers.reduce((minSeller, currentSeller) =>
+            currentSeller.distance < minSeller.distance ? currentSeller : minSeller
+          );
+          setSelectedSellers((prevSelected) => ({
+            ...prevSelected,
+            [variant.variantId]: closestSeller,
+          }));
+        }
+      }
+    });
+  }, [shop, selectedSellers]);
+
   // Transform selectedSellers into the desired format
   const transformSelectedSellers = () => {
     return Object.entries(selectedSellers)?.map(([variantId, seller]) => {
-      const variant = shop?.find(v => v.variantId === variantId);
+      const variant = shop?.find((v) => v.variantId === variantId);
       return {
         variantId,
         variantName: variant.variantName,
@@ -42,11 +66,10 @@ const ShopCartList = ({ shop }) => {
   };
 
   // Check if all variants have a selected seller
-  const isAllSelected = shop?.every(variant => selectedSellers[variant.variantId]);
+  const isAllSelected = shop?.every((variant) => selectedSellers[variant.variantId]);
 
   return (
     <div>
-
       <ToastContainer />
       <div className="flex justify-end mb-3 mr-3">
         <button
@@ -66,25 +89,31 @@ const ShopCartList = ({ shop }) => {
         <div className="border mb-3 p-5" key={index}>
           <h1 className="my-2 font-semibold">{variant.variantName}</h1>
           <div>
-            {variant.sellers.map((seller) => (
-              <div
-                key={seller.sellerId}
-                className={`relative border p-4 mb-2 rounded-md cursor-pointer ${
-                  selectedSellers[variant.variantId]?.sellerId === seller.sellerId
-                    ? "border-green-600"
-                    : "border-gray-300"
-                }`}
-                onClick={() => handleSelectSeller(variant.variantId, seller.sellerId)}
-              >
-                <ShopCart shop={seller} />
-                {/* Display "Selected" label if this seller is selected */}
-                {selectedSellers[variant.variantId]?.sellerId === seller.sellerId && (
-                  <div className="absolute bottom-2 right-2 text-green-600 font-semibold">
-                    Selected
-                  </div>
-                )}
+            {variant.sellers.length > 0 ? (
+              variant.sellers.map((seller) => (
+                <div
+                  key={seller.sellerId}
+                  className={`relative border p-4 mb-2 rounded-md cursor-pointer ${
+                    selectedSellers[variant.variantId]?.sellerId === seller.sellerId
+                      ? "border-green-600"
+                      : "border-gray-300"
+                  }`}
+                  onClick={() => handleSelectSeller(variant.variantId, seller.sellerId)}
+                >
+                  <ShopCart shop={seller} />
+                  {/* Display "Selected" label if this seller is selected */}
+                  {selectedSellers[variant.variantId]?.sellerId === seller.sellerId && (
+                    <div className="absolute bottom-2 right-2 text-green-600 font-semibold">
+                      Selected
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-red-600 font-semibold">
+                In this variant, no seller is available
               </div>
-            ))}
+            )}
           </div>
         </div>
       ))}
