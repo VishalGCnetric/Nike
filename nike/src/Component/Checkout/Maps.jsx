@@ -1,69 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Tooltip,
+  useMap,
+} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import axios from 'axios';
 
+// Custom icon for user location (red icon)
+const userIcon = new L.Icon({
+  iconUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  iconRetinaUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowSize: [41, 41],
+});
+
+// Custom icon for shops (green icon)
+const shopIcon = new L.Icon({
+  iconUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  iconRetinaUrl:
+    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowSize: [41, 41],
+});
+
 // Fix for missing marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconRetinaUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
 const Maps = ({ currentLocation, nearbyShops }) => {
-  const [position, setPosition] = useState(null);
   const [address, setAddress] = useState('');
   const [error, setError] = useState(null);
+  const markersRef = useRef({});
 
   useEffect(() => {
-    // Get the current location of the user
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const { latitude, longitude } = pos.coords;
-          console.log('Position:', latitude, longitude); // Debug output
-          setPosition([18.2604291, 76.1826324]); // Replace with actual position if needed
-
-          // Fetch address from latitude and longitude
-          try {
-            const response = await axios.get(
-              `https://nominatim.openstreetmap.org/reverse?lat=${18.2604291}&lon=${76.1826324}&format=json`
-            );
-            console.log('Address Response:', response.data); // Debug output
-            setAddress(response.data.display_name);
-          } catch (err) {
-            setError('Unable to fetch address');
-          }
-        },
-        (err) => {
-          setError(err.message);
-        }
-      );
-    } else {
-      setError('Geolocation is not supported by this browser.');
+    // Reverse geocode to get the address from coordinates
+    if (currentLocation) {
+      axios
+        .get(
+          `https://nominatim.openstreetmap.org/reverse?lat=${currentLocation.lng}&lon=${currentLocation.lat}&format=json`
+        )
+        .then((res) => setAddress(res.data.display_name))
+        .catch(() => setError('Unable to fetch address'));
     }
-  }, []);
+  }, [currentLocation]);
+
+  // Function to auto-open tooltips when zoom level is high enough
+  const AutoOpenTooltips = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      const handleZoom = () => {
+        const zoomLevel = map.getZoom();
+        if (zoomLevel >= 13) {
+          // Open tooltips for all markers
+          Object.values(markersRef.current).forEach((marker) => {
+            marker.openTooltip();
+          });
+        } else {
+          // Close tooltips for all markers
+          Object.values(markersRef.current).forEach((marker) => {
+            marker.closeTooltip();
+          });
+        }
+      };
+
+      map.on('zoomend', handleZoom);
+
+      // Initial check
+      handleZoom();
+
+      return () => {
+        map.off('zoomend', handleZoom);
+      };
+    }, [map]);
+
+    return null;
+  };
+
+  const position = [currentLocation.lng,currentLocation.lat ];
 
   return (
     <div>
       {error && <p>{error}</p>}
-      {position ? (
+      {currentLocation ? (
         <div>
           <MapContainer
             center={position}
-            zoom={10} // Zoom level
+            zoom={7} // Zoom level
             style={{ height: '400px', width: '100%' }}
           >
             <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
+              url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+              attribution=''
             />
 
             {/* Marker for the current user location */}
-            <Marker position={position}>
-              <Tooltip>You are here <br /> {address}</Tooltip>
+            <Marker position={position} icon={userIcon}>
+              <Tooltip
+                direction='top'
+                offset={[0, -10]}
+                opacity={1}
+                permanent
+                className='tooltip-content'
+              >
+                <div>
+                  <strong>You are here</strong>
+                  <br />
+                  {/* {address} */}
+                </div>
+              </Tooltip>
             </Marker>
 
             {/* Markers for nearby shops */}
@@ -72,11 +141,38 @@ const Maps = ({ currentLocation, nearbyShops }) => {
                 shop.sellers.map((seller) => (
                   <Marker
                     key={seller.sellerId}
-                    position={[seller.coordinates.lng, seller.coordinates.lat]} // Swapped lat and lng
+                    position={[
+                        seller.coordinates.lng,
+                      seller.coordinates.lat
+                     
+                    ]}
+                    icon={shopIcon}
+                    
+                    ref={(ref) => {
+                      if (ref) {
+                        markersRef.current[seller.sellerId] = ref;
+                      }
+                    }}
                   >
-                    <Tooltip direction="top" offset={[0, -10]} opacity={1}>
-                      <strong>{seller.sellerName}</strong> <br />
-                      <a href={seller.mapLink} target="_blank" rel="noopener noreferrer">View on map</a>
+                    <Tooltip
+                      direction='top'
+                      offset={[0, -10]}
+                      permanent
+                      opacity={1}
+                      className='tooltip-content'
+                    >
+                      <div>
+                        <strong>{seller.sellerName}</strong>
+                        <p>Distance {seller.distance} km away</p>
+                        <br />
+                        {/* <a
+                          href={seller.mapLink}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                        >
+                          View on map
+                        </a> */}
+                      </div>
                     </Tooltip>
                   </Marker>
                 ))
@@ -84,6 +180,8 @@ const Maps = ({ currentLocation, nearbyShops }) => {
             ) : (
               <p>No shops available nearby.</p>
             )}
+
+            <AutoOpenTooltips />
           </MapContainer>
 
           <p>Address: {address}</p>

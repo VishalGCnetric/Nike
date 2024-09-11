@@ -85,10 +85,12 @@ const ShopCartList = ({shop}) => {
   return (
     <div>
       <ToastContainer/>
-      <div className="flex justify-end mb-3 mr-3">
+      <div className="flex justify-between mb-3 mr-3">
+      <h2 className="text-xl font-semibold mb-4">Select a Shop</h2>
+
         <button
           onClick={handleContinue}
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+          className="px-4 py-2 bg-black text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
         >
           Continue
         </button>
