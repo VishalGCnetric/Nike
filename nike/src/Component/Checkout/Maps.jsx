@@ -27,8 +27,8 @@ const userIcon = new L.Icon({
 
 // Custom icon for shops (green icon)
 const shopIcon = new L.Icon({
-  iconUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+
   iconRetinaUrl:
     'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
   iconSize: [25, 41],
@@ -75,7 +75,7 @@ const Maps = ({ currentLocation, nearbyShops }) => {
     useEffect(() => {
       const handleZoom = () => {
         const zoomLevel = map.getZoom();
-        if (zoomLevel >= 13) {
+        if (zoomLevel >= 8) {
           // Open tooltips for all markers
           Object.values(markersRef.current).forEach((marker) => {
             marker.openTooltip();
@@ -142,8 +142,8 @@ const Maps = ({ currentLocation, nearbyShops }) => {
                   <Marker
                     key={seller.sellerId}
                     position={[
-                        seller.coordinates.lng,
-                      seller.coordinates.lat
+                        seller.coordinates.lat,
+                      seller.coordinates.lng
                      
                     ]}
                     icon={shopIcon}

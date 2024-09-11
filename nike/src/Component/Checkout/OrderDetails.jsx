@@ -126,17 +126,17 @@ const OrderDetails = () => {
                     </div>
                 )}
 
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                {/* <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                     This is an international shipment requiring customs clearance.
-                </p>
+                </p> */}
             </div>
-            <button
+            {/* <button
                 className={`${sharedClasses.button} ${isContinueEnabled ? '' : ''}`}
                 // disabled={!isContinueEnabled}
                 onClick={()=>{navigate("/checkout/billing")}}
             >
                 Continue
-            </button>
+            </button> */}
             <DeliveryInformation />
             <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
                 <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Shipping</h4>
@@ -148,52 +148,7 @@ const OrderDetails = () => {
             <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
                 <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Payment</h4>
             </div>
-            {/* Modal for Pickup from Dealer */}
-            <Modal open={isModalOpen} onClose={handleCloseModal}>
-                <div className="p-4 bg-white dark:bg-background rounded-lg shadow-md w-full max-w-lg mx-auto mt-10">
-                    <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-4">Select a Dealer</h3>
-                    <div className="flex">
-                        <div className="w-1/2 pr-2">
-                            <div className="border rounded-md p-2 bg-gray-100">
-                                <p className="text-sm text-zinc-600 dark:text-zinc-400">Your Current Location</p>
-                                {userLocation ? (
-                                    <MapContainer
-                                        center={[userLocation.lat, userLocation.lng]}
-                                        zoom={13}
-                                        style={{ height: '200px', width: '100%' }}
-                                    >
-                                        <TileLayer
-                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                        />
-                                        <Marker position={[userLocation.lat, userLocation.lng]} icon={defaultIcon}>
-                                            <Popup>You are here</Popup>
-                                        </Marker>
-                                    </MapContainer>
-                                ) : (
-                                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Fetching location...</p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="w-1/2 pl-2">
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400">Nearby Dealers</p>
-                            {renderDealers()}
-                        </div>
-                    </div>
-                    {selectedDealer && (
-                        <div className="mt-4">
-                            <h4 className="text-md font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
-                                Selected Dealer
-                            </h4>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                {selectedDealer.name} - {selectedDealer.location}
-                            </p>
-                            <button className={`${sharedClasses.button} mt-4`} onClick={handleCloseModal}>
-                                Continue
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </Modal>
+          
         </div>
     );
 };

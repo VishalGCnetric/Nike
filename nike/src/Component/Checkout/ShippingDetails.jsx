@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Modal, RadioGroup, Radio, FormControlLabel } from '@mui/material';
 import { toast } from 'react-toastify'; // For toast notifications
 import axios from 'axios'; // For geocoding requests
 import ShopSelectionModal from './ShopSelectionModal'; // Custom modal for shop selection
 import { useNavigate } from 'react-router-dom';
+import { fetchEligibleDealers } from '../../redux/slices/cartSlice';
 
-const shop = {
+const dummyshop = {
   data: [
     {
       variantId: "107",
@@ -20,6 +21,14 @@ const shop = {
           coordinates: { lat: 76.6126324, lng: 18.2604291 },
           mapLink: "https://maps.app.goo.gl/ginWn95sFEK5PWKF8",
         },
+        {
+          sellerId: "2",
+          sellerName: "Dev Logistics",
+          price: 274750,
+          coordinates: { lat: 75.6326324, lng: 18.2604291 }
+          ,
+          mapLink: "https://www.google.com/maps/place/Chandni+Chowk,+Delhi/@28.6513747,77.2316374,15z/",
+        }
       ],
     },
     {
@@ -48,6 +57,13 @@ const shop = {
 };
 
 const ShippingDetails = () => {
+  const dispatch = useDispatch();
+  const shop = useSelector((state) => state.cart.eligibleDealers);
+ 
+  const status = useSelector((state) => state.cart.status);
+  const error = useSelector((state) => state.cart.error);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [locationGranted, setLocationGranted] = useState(false);
   const [browserCoordinates, setBrowserCoordinates] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,7 +74,15 @@ const ShippingDetails = () => {
   const [showShippingPopup, setShowShippingPopup] = useState(false);
 const navigate=useNavigate();
   // Get shipping data from Redux store or localStorage
-  const shippingData = useSelector(state => state.checkout.shippingAddress) || JSON.parse(localStorage.getItem('shippingAddress'));
+  const shippingData =  JSON.parse(localStorage.getItem('shippingAddress'));
+ // Dispatch fetchEligibleDealers when the modal opens and show loader
+useEffect(() => {
+  if (isModalOpen) {
+    setIsLoading(true); // Show loader when fetching starts
+    dispatch(fetchEligibleDealers()).finally(() => setIsLoading(false)); // Hide loader once fetching is done
+  }
+}, [dispatch, isModalOpen]);
+
 
   // Request browser location permission
   useEffect(() => {
@@ -105,18 +129,18 @@ const navigate=useNavigate();
       geoOptions
     );
   }, []);
-  
+ 
 // console.log(locationGranted,browserCoordinates);
   // Fetch nearby shops based on browser coordinates
   useEffect(() => {
-    if (browserCoordinates) {
-      const shopsWithin50km = shop?.data?.reduce((acc, variant) => {
+    if (browserCoordinates && isModalOpen) {
+      const shopsWithin50km = shop?.reduce((acc, variant) => {
         const nearbySellers = variant.sellers.map((seller) => {
           let distance = calculateDistance(
             browserCoordinates.lat,
             browserCoordinates.lng,
-            seller.coordinates.lat,
-            seller.coordinates.lng
+            seller.coordinates.lng,
+            seller.coordinates.lat
           );
           distance = Math.ceil(distance);
           console.log(`Distance from user to seller (${seller.sellerName}): ${distance} km`);
@@ -126,19 +150,21 @@ const navigate=useNavigate();
           };
         }).filter(seller => seller.distance <= 50); // Keep only those within 51km
   
-        if (nearbySellers.length) {
-          acc.push({
-            sku: variant.sku,
-            variantId: variant.variantId,
-            variantName: variant.variantName,
-            sellers: nearbySellers,
-          });
-        }
+        // Ensure the variant is added even if there are no sellers within 50km
+        acc.push({
+          sku: variant.sku,
+          variantId: variant.variantId,
+          variantName: variant.variantName,
+          sellers: nearbySellers.length ? nearbySellers : [], // If no sellers, send an empty array
+        });
+  
         return acc;
       }, []);
+  
       setNearbyShops(shopsWithin50km);
     }
-  }, [browserCoordinates]);
+  }, [browserCoordinates, shop, isModalOpen]);
+  
   
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -166,7 +192,7 @@ const navigate=useNavigate();
         );
         if (response.data.length > 0) {
           const { lat, lon } = response.data[0];
-          setBrowserCoordinates({lat:parseFloat(lat), lng: parseFloat(lon) });
+          setBrowserCoordinates({lat:parseFloat(lon), lng: parseFloat(lat) });
           return true;
         }
         return false;
@@ -179,7 +205,7 @@ const navigate=useNavigate();
     const geocodePriorities = [
       `${address.streetLine1}, ${address.city}, ${address.state}, ${address.country}`,
       `${address.streetLine2}, ${address.city}, ${address.state}, ${address.country}`,
-      `${address.postalCode}, ${address.city}, ${address.state}, ${address.country}`
+      `${address.postalCode} `
     ];
 
     for (const query of geocodePriorities) {
@@ -195,7 +221,7 @@ const navigate=useNavigate();
     const value = event.target.value;
     setSelectedOption(value);
 
-    if (value === 'pick') {
+    if (value === 'pickup') {
       if (browserCoordinates) {
         setIsModalOpen(true);
       } else {
@@ -206,6 +232,7 @@ const navigate=useNavigate();
         await attemptAddressGeocoding(shippingData);
       }
       setShowShippingPopup(true);
+      // setSelectedOption("shipping")
     }
   };
 
@@ -213,6 +240,7 @@ const navigate=useNavigate();
   const handleShopSelection = (shop) => {
     setSelectedShop(shop);
     setIsModalOpen(false);
+
     localStorage.setItem("selectedShop", JSON.stringify(shop));
   };
 
@@ -226,7 +254,7 @@ const navigate=useNavigate();
     setShowShippingPopup(false);
     setIsModalOpen(true);
   };
-console.log(nearbyShops)
+// console.log("NearbyShop",nearbyShops)
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Shipping Details</h1>
@@ -235,7 +263,7 @@ console.log(nearbyShops)
         <FormControlLabel value="shipping" control={<Radio />} label="Ship to my address" />
         {locationGranted && (
           <>
-            <FormControlLabel value="pick" control={<Radio />} label="Pick from dealer" />
+            <FormControlLabel value="pickup" control={<Radio />} label="Pick from dealer" />
             <FormControlLabel value="ship" control={<Radio />} label="Ship from dealer" />
           </>
         )}
@@ -243,10 +271,15 @@ console.log(nearbyShops)
 
       <ShopSelectionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() =>{ setIsModalOpen(false)
+          // setSelectedOption("shipping")
+
+        }}
         coordinates={browserCoordinates }
         nearbyShops={nearbyShops}
         onSelectShop={handleShopSelection}
+        isLoading={isLoading} // Pass the loader state to the modal
+        deliveryType={selectedOption}
       />
 
       <Modal open={showShippingPopup} onClose={() => setShowShippingPopup(false)} className="flex align-center justify-center">

@@ -44,17 +44,31 @@ export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async (lin
     return rejectWithValue(error.response.data.message || error.message);
   }
 });
-
+// Thunk to fetch eligible dealers
+export const fetchEligibleDealers = createAsyncThunk('cart/fetchEligibleDealers', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get('http://106.51.242.196:50102/elgDealers', {
+      headers: {
+        accesstoken: '58c169e03202c7dcf65dc4fb9afdae689de6a101f86778c0481fee4bf8d0053b',
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data.message || error.message);
+  }
+});
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
     cart: null,
+    eligibleDealers: null,  // Add eligibleDealers state
     status: 'idle',
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Fetch cart cases
       .addCase(fetchCart.pending, (state) => {
         state.status = 'loading';
       })
@@ -66,21 +80,39 @@ const cartSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload;
       })
+
+      // Update cart item cases
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.cart = action.payload;
         toast.success('Cart updated successfully!');
       })
+      .addCase(updateCartItem.rejected, (state, action) => {
+        toast.error(`Failed to update cart: ${action.payload}`);
+      })
+
+      // Delete cart item cases
       .addCase(deleteCartItem.fulfilled, (state, action) => {
         state.cart = action.payload;
         toast.success('Item removed successfully!');
       })
-      .addCase(updateCartItem.rejected, (state, action) => {
-        toast.error(`Failed to update cart: ${action.payload}`);
-      })
       .addCase(deleteCartItem.rejected, (state, action) => {
         toast.error(`Failed to remove item: ${action.payload}`);
+      })
+
+      // Fetch eligible dealers cases
+      .addCase(fetchEligibleDealers.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchEligibleDealers.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.eligibleDealers = action.payload;
+      })
+      .addCase(fetchEligibleDealers.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });
 
 export default cartSlice.reducer;
+

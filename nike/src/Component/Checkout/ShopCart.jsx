@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const ShopCart = ({ shop, onClick }) => {
-  const position = [shop.coordinates.lng,shop.coordinates.lat]; 
+  const position = [shop.coordinates.lat,shop.coordinates.lng]; 
 
   return (
     <div
