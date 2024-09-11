@@ -7,6 +7,7 @@ import axios from "axios";
 import ShopCartList from "./ShopCartList";
 import Maps from "./Maps";
 import ShopCart from "./ShopCart";
+import FindingDealerLoader from "../Loader/FindingDealerLoader";
 
 // Custom marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -22,11 +23,13 @@ const ShopSelectionModal = ({
   coordinates,
   nearbyShops = [],
   onSelectShop,
+  isLoading,
+  deliveryType
 }) => {
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [selectedShops, setSelectedShops] = useState({}); // Track selected shop per variant
-console.log(coordinates)
+
   useEffect(() => {
     if (coordinates) {
       const fetchAddress = async () => {
@@ -48,37 +51,18 @@ console.log(coordinates)
   }, [coordinates]);
   
 
-  // Handle shop selection and update local storage
-  const handleSelectShop = (variantName, shop) => {
-    const updatedSelection = {
-      ...selectedShops,
-      [variantName]: shop,
-    };
+ 
   
-    setSelectedShops(updatedSelection);
-    localStorage.setItem("selectedShops", JSON.stringify(updatedSelection));
   
-    if (onSelectShop) {
-      onSelectShop(updatedSelection);
-    }
-  };
   
-  // Conditional highlight for selected shop
-  const isSelected = (variantName, shopId) => {
-    return selectedShops[variantName]?.sellerId === shopId;
-  };
-  // Fetch selected shops from localStorage on component mount
-  useEffect(() => {
-    const storedSelection = JSON.parse(localStorage.getItem("selectedShops")) || {};
-    if (Object.keys(storedSelection).length > 0) {
-      setSelectedShops(storedSelection);
-    }
-  }, []);
   
 
   return (
     <Modal open={isOpen} onClose={onClose} className="flex items-center justify-center">
       <div className="bg-white rounded-lg p-5 w-full max-w-5xl mx-auto max-h-[90vh] overflow-auto">
+      {isLoading ? (          <div className="w-full sm:w-1/2 h-full mb-5 sm:mb-0">
+
+<FindingDealerLoader/>   </div>     ) : (
         <div className="flex flex-col sm:flex-row">
           {/* Left side: Map */}
           <div className="w-full sm:w-1/2 h-full mb-5 sm:mb-0">
@@ -92,9 +76,9 @@ console.log(coordinates)
 
           {/* Right side: List of shops */}
           <div className="w-full sm:w-1/2 pl-0 sm:pl-6 overflow-y-auto max-h-96">
-            <ShopCartList shop={nearbyShops}/>
+            <ShopCartList shop={nearbyShops} deliveryType={deliveryType}/>
 </div>
-      </div>
+      </div>)}
       </div>
     </Modal>
   );

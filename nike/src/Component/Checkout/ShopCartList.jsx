@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
 // Assuming shop is passed as a prop
-const ShopCartList = ({ shop }) => {
+const ShopCartList = ({ shop,deliveryType }) => {
   const [selectedSellers, setSelectedSellers] = useState({});
   const navigate = useNavigate();
+  console.log(selectedSellers)
 
   // Handle seller selection when a card is clicked
   const handleSelectSeller = (variantId, sellerId) => {
@@ -60,23 +61,59 @@ const ShopCartList = ({ shop }) => {
 
   const handleContinue = () => {
     const selectedDealers = transformSelectedSellers(); // Call the function to get the data
+    if(deliveryType=="pickup"){
+      localStorage.setItem("shippingAddress", null);
+
+    }
+    saveSellersToLocalStorage(selectedDealers,deliveryType)
     localStorage.setItem("selectedShippingDealers", JSON.stringify(selectedDealers));
     notify();
     navigate("/checkout/billing");
   };
+  function saveSellersToLocalStorage(shopData, deliveryType) {
+    // Collect unique sellerId with their respective shipMethodId
+    const sellerInfo = shopData.reduce((acc, variant) => {
+      variant.sellers.forEach((seller) => {
+        if (!acc[seller.shipMethodId]) {
+          acc[seller.shipMethodId] = []; // Initialize the array for the shipMethodId
+        }
+        if (!acc[seller.shipMethodId].includes(seller.sellerId)) {
+          acc[seller.shipMethodId].push(seller.sellerId); // Add sellerId to the shipMethodId's array
+        }
+      });
+      return acc;
+    }, {});
+  
+    // Format the dealer data as required
+    const dealerData = {
+      dealer: {
+        deliveryType: deliveryType,
+        shipMethodId: Object.keys(sellerInfo).map((shipMethodId) =>shipMethodId )
+      }
+    };
+  
+    // Save to localStorage
+    localStorage.setItem("dealerData", JSON.stringify(dealerData));
+    console.log("Dealer data saved to localStorage:", dealerData);
+  }
+  
+  
+  
 
   // Check if all variants have a selected seller
   const isAllSelected = shop?.every((variant) => selectedSellers[variant.variantId]);
 
+
   return (
     <div>
       <ToastContainer />
-      <div className="flex justify-end mb-3 mr-3">
+      <div className="flex justify-between mb-3 mr-3">
+        <div ClassName="text-lg font-semibold">Choose Nearby Shop</div>
         <button
           onClick={handleContinue}
           className={`px-4 py-2 text-white font-semibold rounded-md transition duration-300 ${
             isAllSelected
-              ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              ? "bg-black hover:bg-blue-700 cursor-pointer"
               : "bg-gray-300 cursor-not-allowed"
           }`}
           disabled={!isAllSelected} // Disable the button if not all sellers are selected
@@ -85,12 +122,21 @@ const ShopCartList = ({ shop }) => {
         </button>
       </div>
 
-      {shop?.map((variant, index) => (
-        <div className="border mb-3 p-5" key={index}>
-          <h1 className="my-2 font-semibold">{variant.variantName}</h1>
-          <div>
-            {variant.sellers.length > 0 ? (
-              variant.sellers.map((seller) => (
+      {shop.length === 0 ? (
+  <div className="text-red-600 font-semibold">
+    For This Cart Products, No Seller Is Available
+  </div>
+) : (
+  <>
+    {shop?.map((variant, index) => (
+      <div className="border mb-3 p-5" key={index}>
+        <h1 className="my-2 font-semibold">{variant.variantName}</h1>
+        <div>
+          {variant.sellers.length > 0 ? (
+            variant.sellers
+              .sort((a, b) => a.distance - b.distance) // Sort sellers by ascending distance
+              .map((seller) => (
+
                 <div
                   key={seller.sellerId}
                   className={`relative border p-4 mb-2 rounded-md cursor-pointer ${
@@ -109,14 +155,19 @@ const ShopCartList = ({ shop }) => {
                   )}
                 </div>
               ))
-            ) : (
-              <div className="text-red-600 font-semibold">
-                In this variant, no seller is available
-              </div>
-            )}
-          </div>
+
+          ) : (
+            <div className="text-red-600 font-semibold">
+              For this variant, no seller is available
+            </div>
+          )}
+
         </div>
-      ))}
+      </div>
+    ))}
+  </>
+)}
+
     </div>
   );
 };
