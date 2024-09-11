@@ -1,61 +1,21 @@
 import React, { useState } from "react";
 import ShopCart from "./ShopCart"; // Ensure you import the ShopCart component
-import { json, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
-// export const shop = {
-//   data: [
-//     {
-//       variantId: "107",
-//       variantName: "Air Jordan 1 Low SE Brown/Sail/Neutral Grey/Archaeo Brown",
-//       sku: "HF1567-200",
-//       sellers: [
-//         {
-//           sellerId: "3",
-//           sellerName: "Sneakersnstuff",
-//           price: 1149500,
-//           coordinates: { lat: 59.3131645, lng: 18.0739928 },
-//           mapLink: "https://maps.app.goo.gl/ginWn95sFEK5PWKF8",
-//         },
-//       ],
-//     },
-//     {
-//       variantId: "150",
-//       variantName: "Jordan Artist Series By Darien Birks Dark Smoke Grey",
-//       sku: "HF5470-070",
-//       sellers: [
-//         {
-//           sellerId: "2",
-//           sellerName: "Dev Logistics",
-//           price: 274750,
-//           coordinates: { lat: 28.6513747, lng: 77.2316374 },
-//           mapLink:
-//             "https://www.google.com/maps/place/Chandni+Chowk,+Delhi/@28.6513747,77.2316374,15z/",
-//         },
-//         {
-//           sellerId: "5",
-//           sellerName: "Finish Line",
-//           price: 549500,
-//           coordinates: { lat: 39.8162553, lng: -85.9969006 },
-//           mapLink: "https://maps.app.goo.gl/tSQsEzQzpZca7uZc6",
-//         },
-//       ],
-//     },
-//   ],
-// };
-
-const ShopCartList = ({shop}) => {
+// Assuming shop is passed as a prop
+const ShopCartList = ({ shop }) => {
   const [selectedSellers, setSelectedSellers] = useState({});
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  // Handle checkbox change
+  // Handle seller selection when a card is clicked
   const handleSelectSeller = (variantId, sellerId) => {
     const selectedVariant = shop?.find(v => v.variantId === variantId);
     const selectedSeller = selectedVariant.sellers.find(s => s.sellerId === sellerId);
 
     setSelectedSellers((prevSelected) => ({
       ...prevSelected,
-      [variantId]: selectedSeller // Store the selected seller for this variant
+      [variantId]: selectedSeller, // Store the selected seller for this variant
     }));
   };
 
@@ -67,54 +27,67 @@ const ShopCartList = ({shop}) => {
         variantId,
         variantName: variant.variantName,
         sku: variant.sku,
-        sellers: [seller] // Store only the selected seller for this variant
+        sellers: [seller], // Store only the selected seller for this variant
       };
     });
   };
 
   const notify = () => toast.success("Added sellers address");
+
   const handleContinue = () => {
     const selectedDealers = transformSelectedSellers(); // Call the function to get the data
     localStorage.setItem("selectedShippingDealers", JSON.stringify(selectedDealers));
-    notify(); // Assuming `notify` is a function to show a notification
-    navigate('/checkout/billing')
+    notify();
+    navigate("/checkout/billing");
   };
-  
 
+  // Check if all variants have a selected seller
+  const isAllSelected = shop?.every(variant => selectedSellers[variant.variantId]);
 
   return (
     <div>
-      <ToastContainer/>
-      <div className="flex justify-between mb-3 mr-3">
-      <h2 className="text-xl font-semibold mb-4">Select a Shop</h2>
 
+      <ToastContainer />
+      <div className="flex justify-end mb-3 mr-3">
         <button
           onClick={handleContinue}
-          className="px-4 py-2 bg-black text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+          className={`px-4 py-2 text-white font-semibold rounded-md transition duration-300 ${
+            isAllSelected
+              ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed"
+          }`}
+          disabled={!isAllSelected} // Disable the button if not all sellers are selected
         >
           Continue
         </button>
       </div>
 
-      {shop?.map((variant,index) => (
+      {shop?.map((variant, index) => (
         <div className="border mb-3 p-5" key={index}>
           <h1 className="my-2 font-semibold">{variant.variantName}</h1>
           <div>
             {variant.sellers.map((seller) => (
-              <div key={seller.sellerId} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  checked={selectedSellers[variant.variantId]?.sellerId === seller.sellerId}
-                  onChange={() => handleSelectSeller(variant.variantId, seller.sellerId)}
-                  className="mr-2"
-                />
+              <div
+                key={seller.sellerId}
+                className={`relative border p-4 mb-2 rounded-md cursor-pointer ${
+                  selectedSellers[variant.variantId]?.sellerId === seller.sellerId
+                    ? "border-green-600"
+                    : "border-gray-300"
+                }`}
+                onClick={() => handleSelectSeller(variant.variantId, seller.sellerId)}
+              >
                 <ShopCart shop={seller} />
+                {/* Display "Selected" label if this seller is selected */}
+                {selectedSellers[variant.variantId]?.sellerId === seller.sellerId && (
+                  <div className="absolute bottom-2 right-2 text-green-600 font-semibold">
+                    Selected
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       ))}
-      
     </div>
   );
 };

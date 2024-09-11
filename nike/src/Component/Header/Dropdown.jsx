@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 const Dropdown = ({ sections, onMouseEnter, onMouseLeave }) => {
   return (
     <div
-      className="bg-white absolute left-0 top-full mt-2 rounded-lg shadow-lg w-screen"
+      className="bg-white absolute left-0 top-full mt-2 rounded-lg shadow-lg w-screen z-50"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="overflow-x-auto">
+      <div className="overflow-x-hidden max-w-screen-xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
           {sections?.map((section, index) => (
             <motion.div

@@ -57,9 +57,9 @@ export const Lists = [
         ]
     },
     { name: 'Men', dropdownList: [{title:'Features',items:['New Released']}] },
-    { name: 'Women', dropdownList: [] },
-    { name: 'Kids', dropdownList: [] },
-    { name: 'Sale', dropdownList: [] },
-    { name: 'Customise', dropdownList: [] },
-    { name: 'SNKRS', dropdownList: [] }
+    { name: 'Women', dropdownList: [{title:'Features',items:['New Released']}] },
+    { name: 'Kids', dropdownList: [{title:'Features',items:['New Released']}] },
+    { name: 'Sale', dropdownList: [{title:'Features',items:['New Released']}] },
+    { name: 'Customise', dropdownList: [{title:'Features',items:['New Released']}] },
+    { name: 'SNKRS', dropdownList: [{title:'Features',items:['New Released']}] }
 ];
