@@ -13,6 +13,7 @@ const ShopCartList = ({ shop,deliveryType }) => {
   const handleSelectSeller = (variantId, sellerId) => {
     const selectedVariant = shop?.find((v) => v.variantId === variantId);
     const selectedSeller = selectedVariant.sellers.find((s) => s.sellerId === sellerId);
+
     setSelectedSellers((prevSelected) => ({
       ...prevSelected,
       [variantId]: selectedSeller, // Store the selected seller for this variant
@@ -120,6 +121,7 @@ const ShopCartList = ({ shop,deliveryType }) => {
           Continue
         </button>
       </div>
+
       {shop.length === 0 ? (
   <div className="text-red-600 font-semibold">
     For This Cart Products, No Seller Is Available
@@ -134,6 +136,7 @@ const ShopCartList = ({ shop,deliveryType }) => {
             variant.sellers
               .sort((a, b) => a.distance - b.distance) // Sort sellers by ascending distance
               .map((seller) => (
+
                 <div
                   key={seller.sellerId}
                   className={`relative border p-4 mb-2 rounded-md cursor-pointer ${
@@ -152,11 +155,13 @@ const ShopCartList = ({ shop,deliveryType }) => {
                   )}
                 </div>
               ))
+
           ) : (
             <div className="text-red-600 font-semibold">
               For this variant, no seller is available
             </div>
           )}
+
         </div>
       </div>
     ))}
