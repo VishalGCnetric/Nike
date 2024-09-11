@@ -26,48 +26,55 @@ const ShopSelectionModal = ({
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [selectedShops, setSelectedShops] = useState({}); // Track selected shop per variant
-
+console.log(coordinates)
   useEffect(() => {
     if (coordinates) {
       const fetchAddress = async () => {
         try {
+          setError('');  // Reset any previous error
           const response = await axios.get(
-            `https://nominatim.openstreetmap.org/reverse?lat=${coordinates.lat}&lon=${coordinates.lng}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${coordinates.lng}&lon=${coordinates.lat}&format=json`
           );
           setAddress(response.data.display_name);
         } catch (err) {
-          setError('Unable to fetch address');
+          setError('Unable to fetch address. Please try again later.');
         }
       };
+  if(isOpen && coordinates ){
+    fetchAddress();
 
-      fetchAddress();
+  }
     }
   }, [coordinates]);
+  
 
   // Handle shop selection and update local storage
   const handleSelectShop = (variantName, shop) => {
-    // Update selected shop for the variant
     const updatedSelection = {
       ...selectedShops,
       [variantName]: shop,
     };
-
+  
     setSelectedShops(updatedSelection);
-
-    // Store the selected shops in local storage
     localStorage.setItem("selectedShops", JSON.stringify(updatedSelection));
-
-    // You can call onSelectShop to handle further actions outside the component
+  
     if (onSelectShop) {
       onSelectShop(updatedSelection);
     }
   };
-
+  
+  // Conditional highlight for selected shop
+  const isSelected = (variantName, shopId) => {
+    return selectedShops[variantName]?.sellerId === shopId;
+  };
   // Fetch selected shops from localStorage on component mount
   useEffect(() => {
     const storedSelection = JSON.parse(localStorage.getItem("selectedShops")) || {};
-    setSelectedShops(storedSelection);
+    if (Object.keys(storedSelection).length > 0) {
+      setSelectedShops(storedSelection);
+    }
   }, []);
+  
 
   return (
     <Modal open={isOpen} onClose={onClose} className="flex items-center justify-center">
@@ -75,16 +82,16 @@ const ShopSelectionModal = ({
         <div className="flex flex-col sm:flex-row">
           {/* Left side: Map */}
           <div className="w-full sm:w-1/2 h-full mb-5 sm:mb-0">
-            {coordinates ? (
-              <Maps currentLocation={coordinates} nearbyShops={nearbyShops} />
-            ) : (
-              <p>Loading map...</p>
-            )}
+  {coordinates ? (
+    <Maps currentLocation={coordinates} nearbyShops={nearbyShops} />
+  ) : (
+    <p>Loading map...</p>
+  )}
+
           </div>
 
           {/* Right side: List of shops */}
           <div className="w-full sm:w-1/2 pl-0 sm:pl-6 overflow-y-auto max-h-96">
-            <h2 className="text-xl font-semibold mb-4">Select a Shop</h2>
             <ShopCartList shop={nearbyShops}/>
 </div>
       </div>

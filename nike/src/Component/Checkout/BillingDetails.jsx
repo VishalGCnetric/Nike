@@ -25,9 +25,10 @@ const BillingComponent = () => {
   if (data.length > 0) {
     return (
       <div className="container mx-auto p-4">
-        <h2 className="text-2xl font-semibold mb-6">Selected Shipping Dealers</h2>
+        <h2 className="text-2xl font-semibold mb-6">{data?"Selected Shipping Dealers":"Ship To Delivery address"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-          {data.map((variant) => (
+          {data?<>
+            {data.map((variant) => (
             <div
               key={variant.variantId}
               className="border rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300"
@@ -44,6 +45,9 @@ const BillingComponent = () => {
               </div>
             </div>
           ))}
+          </>:        <DeliveryInformation />
+        }
+         
         </div>
         <button
         onClick={() => { navigate("/checkout/payment") }}

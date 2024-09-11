@@ -4,6 +4,7 @@ import { Button, Modal, RadioGroup, Radio, FormControlLabel } from '@mui/materia
 import { toast } from 'react-toastify'; // For toast notifications
 import axios from 'axios'; // For geocoding requests
 import ShopSelectionModal from './ShopSelectionModal'; // Custom modal for shop selection
+import { useNavigate } from 'react-router-dom';
 
 const shop = {
   data: [
@@ -16,7 +17,7 @@ const shop = {
           sellerId: "3",
           sellerName: "Sneakersnstuff",
           price: 1149500,
-          coordinates: { lat: 76.6326324, lng: 18.2604291 },
+          coordinates: { lat: 76.6126324, lng: 18.2604291 },
           mapLink: "https://maps.app.goo.gl/ginWn95sFEK5PWKF8",
         },
       ],
@@ -30,7 +31,7 @@ const shop = {
           sellerId: "2",
           sellerName: "Dev Logistics",
           price: 274750,
-          coordinates: { lat: 75.7326324, lng: 18.2604291 }
+          coordinates: { lat: 75.6326324, lng: 18.2604291 }
           ,
           mapLink: "https://www.google.com/maps/place/Chandni+Chowk,+Delhi/@28.6513747,77.2316374,15z/",
         },
@@ -55,7 +56,7 @@ const ShippingDetails = () => {
   const [nearbyShops, setNearbyShops] = useState([]);
   const [shippingCoordinates, setShippingCoordinates] = useState(null);
   const [showShippingPopup, setShowShippingPopup] = useState(false);
-
+const navigate=useNavigate();
   // Get shipping data from Redux store or localStorage
   const shippingData = useSelector(state => state.checkout.shippingAddress) || JSON.parse(localStorage.getItem('shippingAddress'));
 
@@ -72,11 +73,14 @@ const ShippingDetails = () => {
         setLocationGranted(true);
         // setPosition([18.2604291, 76.1826324]);
 
-        setBrowserCoordinates({
-            lng:18.2604291,
-            lat:76.1826324
-        });
+        // setBrowserCoordinates({
+        //     lng:18.2604291,
+        //     lat:76.1826324
+        // });
+        // console.log(position.coords.latitude,position.coords.longitude)
+        setBrowserCoordinates({lat:parseFloat(76.1826324), lng: parseFloat(18.2604291) });
 
+        // setBrowserCoordinates([position.coords.latitude,position.coords.longitude]);
         //   lat: position.coords.latitude,
         //   lng: position.coords.longitude,
         // });
@@ -102,25 +106,29 @@ const ShippingDetails = () => {
     );
   }, []);
   
-console.log(locationGranted,browserCoordinates);
+// console.log(locationGranted,browserCoordinates);
   // Fetch nearby shops based on browser coordinates
   useEffect(() => {
     if (browserCoordinates) {
       const shopsWithin50km = shop?.data?.reduce((acc, variant) => {
-        const nearbySellers = variant.sellers.filter((seller) => {
-          const distance = calculateDistance(
+        const nearbySellers = variant.sellers.map((seller) => {
+          let distance = calculateDistance(
             browserCoordinates.lat,
             browserCoordinates.lng,
             seller.coordinates.lat,
             seller.coordinates.lng
           );
+          distance = Math.ceil(distance);
           console.log(`Distance from user to seller (${seller.sellerName}): ${distance} km`);
-          return distance <= 51;
-        });
+          return {
+            ...seller,
+            distance, // Add the distance to the seller object
+          };
+        }).filter(seller => seller.distance <= 50); // Keep only those within 51km
   
         if (nearbySellers.length) {
           acc.push({
-            sku:variant.sku,
+            sku: variant.sku,
             variantId: variant.variantId,
             variantName: variant.variantName,
             sellers: nearbySellers,
@@ -132,7 +140,6 @@ console.log(locationGranted,browserCoordinates);
     }
   }, [browserCoordinates]);
   
-
   // Calculate distance between two coordinates (Haversine formula)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the earth in km
@@ -159,7 +166,7 @@ console.log(locationGranted,browserCoordinates);
         );
         if (response.data.length > 0) {
           const { lat, lon } = response.data[0];
-          setBrowserCoordinates({ lat: parseFloat(lat), lng: parseFloat(lon) });
+          setBrowserCoordinates({lat:parseFloat(lat), lng: parseFloat(lon) });
           return true;
         }
         return false;
@@ -254,6 +261,13 @@ console.log(nearbyShops)
       </Modal>
 
       <button 
+      onClick={()=>{
+        localStorage.removeItem('selectedShippingDealers');
+        // localStorage.clear();
+        navigate("/checkout/billing")}
+
+
+    }
         className="w-full bg-black text-white p-2 rounded-lg hover:bg-zinc-800"
         disabled={!selectedShop && selectedOption !== 'shipping'}>
         Continue
