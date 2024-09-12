@@ -29,17 +29,21 @@ const userIcon = new L.Icon({
 const shopIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
 
-  iconRetinaUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   tooltipAnchor: [16, -28],
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+
   shadowSize: [41, 41],
 });
-
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  });
 // Fix for missing marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -110,7 +114,7 @@ const Maps = ({ currentLocation, nearbyShops }) => {
         <div>
           <MapContainer
             center={position}
-            zoom={7} // Zoom level
+            zoom={13} // Zoom level
             style={{ height: '400px', width: '100%' }}
           >
             <TileLayer
@@ -184,7 +188,7 @@ const Maps = ({ currentLocation, nearbyShops }) => {
             <AutoOpenTooltips />
           </MapContainer>
 
-          <p>Address: {address}</p>
+          {/* <p>Address: {address}</p> */}
         </div>
       ) : (
         <p>Fetching location...</p>

@@ -18,18 +18,32 @@ const PaymentForm = () => {
     const [datas ,setData]=useState(null)
 
     const handlePlaceOrder = () => {
-        const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress')); // Get shipping address from localStorage
+        let shippingAddress = JSON.parse(localStorage.getItem('shippingAddress')|| {}) ; // Get shipping address from localStorage
+        const dealerData = JSON.parse(localStorage.getItem('dealerData')); // Get shipping address from localStorage
+
         const cartId = JSON.parse(localStorage.getItem('cartId')); // Get shipping address from localStorage
-        if (!cartId || !shippingAddress) {
-            console.log('Cart ID or shipping address is missing');
-            return;
+        // if (!cartId || !shippingAddress) {
+        //     console.log('Cart ID or shipping address is missing');
+        //     return;
+        // }
+        if(shippingAddress==null){
+            shippingAddress={};
         }
-
-        const data = JSON.stringify({
+        let data;
+       if(dealerData){
+         data = JSON.stringify({
             cartId,
-            shippingAddress
+            shippingAddress,
+            dealer:dealerData.dealer
         });
-
+       }else{
+         data = JSON.stringify({
+            cartId,
+            shippingAddress,
+        });
+       }
+       
+console.log(data)
         const config = {
             method: 'post',
             maxBodyLength: Infinity,
@@ -110,22 +124,8 @@ setData( { orderId, expectedDelivery })
                 Place Order
             </button>
 
-            <div className="mt-6">
-                <h2 className={TEXT_CLASS}>Shipping</h2>
-                <span className={TEXT_MUTED_CLASS}>₹ 2,240.00 Shipping</span>
-                <span className={TEXT_MUTED_CLASS}>Shipper Name</span>
-                <span className={TEXT_MUTED_CLASS}>Arrives Tue, 13 Aug - Fri, 16 Aug</span>
-
-                <h2 className={TEXT_CLASS}>Billing</h2>
-                <div className="flex justify-between items-center">
-                    <span className={TEXT_MUTED_CLASS}>Velvet Girl</span>
-                    <button className="text-primary">Edit</button>
-                </div>
-                <span className={TEXT_MUTED_CLASS}>12, Past St.</span>
-                <span className={TEXT_MUTED_CLASS}>09/07/21 17:35</span>
-
-                <h2 className={TEXT_CLASS}>Payment</h2>
-                <span className={TEXT_MUTED_CLASS}>₹ 2,240.00</span>
+            <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
+                <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Payment</h4>
             </div>
 
             <CheckoutSuccessModal 
