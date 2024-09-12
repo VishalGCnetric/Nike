@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getUserDetails } from '../redux/slices/orders';
+import ShoppingLoader from '../Component/Loader/ShoppingLoader';
 
 const ProfilePage = () => {
   const [data, setData] = useState({});
   const dispatch = useDispatch();
+  const [loading , setLoading] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       const response = await dispatch(getUserDetails());
       setData(response.payload.data.activeCustomer);
+      setLoading(false)
     };
     fetchData();
   }, [dispatch]);
@@ -18,6 +22,10 @@ const ProfilePage = () => {
   // Find the default billing and shipping addresses
   const defaultBillingAddress = data?.addresses?.find(address => address.defaultBillingAddress);
   const defaultShippingAddress = data?.addresses?.find(address => address.defaultShippingAddress);
+
+  if(loading){
+    return <ShoppingLoader/>
+  }
 
   return (
     <div className="container mx-auto p-4">

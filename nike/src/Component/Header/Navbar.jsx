@@ -5,6 +5,9 @@ import { GoSearch } from "react-icons/go";
 import Dropdown from './Dropdown';
 import { Lists } from './navlist';
 import { Link, useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Navbar = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
@@ -13,17 +16,30 @@ const Navbar = () => {
     
     const token = sessionStorage.getItem('token');
    
+    const notify = () => {toast.success("Logout Successfully!");console.log('logout')};
     const handleLogout = () => {
+        // Clear localStorage, sessionStorage, and cookies
         localStorage.clear();
         sessionStorage.clear();
         document.cookie.split(";").forEach((cookie) => {
             document.cookie = cookie.split("=")[0].trim() + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
         });
+    
+        // Show the success toast
+        notify();
+    
+        // Delay navigation and then force a hard refresh
+        setTimeout(() => {
+            navigate('/');  // Navigate to the desired route
+            window.location.reload();  // Force a hard refresh after navigation
+        }, 1000);  // Delay to allow the toast to show
     };
     
+
+
     return (
         <header className="bg-white shadow-sm">
-
+<ToastContainer/>
             <nav className="flex justify-between border-b-gray-100 items-center p-1 bg-background">
                 <div></div>
                 <div className="space-x-4">
@@ -31,7 +47,7 @@ const Navbar = () => {
                     <Link className="text-muted-foreground hover:text-primary">Help</Link>
                     <Link className="text-muted-foreground hover:text-primary">Join Us</Link>
                    {token
-                   ? <Link onClick={handleLogout} className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Logout</Link>
+                   ? <Link onClick={() => {notify(); handleLogout();  }} className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Logout</Link>
                    : <Link to='/auth/signin' className="bg-secondary text-secondary-foreground hover:bg-secondary/80 p-2 rounded">Sign In</Link>}
                 </div>
             </nav>
