@@ -90,24 +90,12 @@ const BillingComponent = () => {
       <div>
         <DeliveryInformation />
       </div>
-      <div className={twClasses.border}></div>
-      <div>
-        <h3 className={twClasses.subHeader}>Shipping</h3>
-        <p className={twClasses.content}>₹ 1,250.00 Shipping</p>
-        <p className={twClasses.content}>Shipment One</p>
-        <p className={twClasses.content}>Arrives Tue, 13 Aug - Fri, 16 Aug</p>
-        <button className={twClasses.editButton}>Edit</button>
-      </div>
-      <div className={twClasses.border}></div>
-      <div>
-        <h3 className={twClasses.subHeader}>Billing</h3>
-        <p className={twClasses.content}>Details here...</p>
-      </div>
-      <div className={twClasses.border}></div>
-      <div>
-        <h3 className={twClasses.subHeader}>Payment</h3>
-        <p className={twClasses.content}>Details here...</p>
-      </div>
+      <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
+                <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Billing</h4>
+            </div>
+            <div className="mt-6 border-t border-zinc-300 dark:border-zinc-600 pt-4">
+                <h4 className="text-md font-bold text-zinc-800 dark:text-zinc-200">Payment</h4>
+            </div>
     </div>
   );
 };

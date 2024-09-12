@@ -109,7 +109,7 @@ const ShopCartList = ({ shop,deliveryType,onClose,setSelectedOption }) => {
       <ToastContainer />
       <div className="flex justify-between mb-3 mr-3 sticky top-0 bg-white p-2">
   {/* Heading */}
-  <div className="text-lg font-semibold text-gray-800">Choose Nearby Shop</div>
+  <div className="text-lg font-bold text-gray-800">Choose Nearby Shop</div>
 
   {/* Continue Button */}
   <button
