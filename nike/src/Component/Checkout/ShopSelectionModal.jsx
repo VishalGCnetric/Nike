@@ -18,6 +18,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const ShopSelectionModal = ({
+  setSelectedOption,
   isOpen,
   onClose,
   coordinates,
@@ -76,7 +77,7 @@ const ShopSelectionModal = ({
 
           {/* Right side: List of shops */}
           <div className="w-full sm:w-1/2 pl-0 sm:pl-6 overflow-y-auto max-h-96">
-            <ShopCartList shop={nearbyShops} deliveryType={deliveryType}/>
+            <ShopCartList shop={nearbyShops} deliveryType={deliveryType} setSelectedOption= {setSelectedOption} onClose={onClose}/>
 </div>
       </div>)}
       </div>
