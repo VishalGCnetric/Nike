@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { clearOrdersState, getAllOrders } from '../redux/slices/orders';
+import ShoppingLoader from '../Component/Loader/ShoppingLoader';
 
 const OrderList = () => {
     const [data, setData] = useState([]);
     const dispatch = useDispatch()
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchData =async()=>{
-
-           const response= await dispatch(getAllOrders());
-          setData(response.payload.orders.items)
+        const fetchData = async () => {
+            setLoading(true)
+            const response = await dispatch(getAllOrders());
+            setData(response.payload.orders.items)
+            setLoading(false)
         }
         fetchData()
-        
-      }, []);
 
-      console.log(data )
+    }, []);
+
+    if (loading) {
+        return <ShoppingLoader />
+    }
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -47,6 +53,24 @@ const OrderList = () => {
                 return 'bg-black';
         }
     };
+
+    if (data.length === 0) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '50vh', textAlign: 'center' }}>
+                <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>
+                    You have no orders!
+                </h1>
+                {/* <p style={{ fontSize: '1rem', color: '#666', marginBottom: '2rem' }}>
+                    Why not place your first order today?
+                </p> */}
+                <button onClick={() => navigate('/')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                    Go to Shop
+                </button>
+            </div>
+        );
+    }
+
+
 
     return (
         <div className="w-full mt-10 px-5 py-5 mx-auto font-sans">

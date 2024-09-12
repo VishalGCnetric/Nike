@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { getOrderDetails } from '../redux/slices/orders';
 import { useParams } from 'react-router-dom';
 import { QRCodeCanvas } from 'qrcode.react';
+import ShoppingLoader from '../Component/Loader/ShoppingLoader';
 
 const OrderDetails = () => {
   const [orderData, setOrderData] = useState(null);
@@ -26,7 +27,7 @@ const OrderDetails = () => {
   }, [dispatch, params.id]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <ShoppingLoader/>
   }
 
   if (!orderData) {
@@ -76,7 +77,7 @@ const OrderDetails = () => {
       {/* Order Summary and Items */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Order Summary */}
-        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+        <div className="bg-gray-100 p-4 rounded-lg h-full shadow-md">
           <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
           <div className="space-y-2">
             <p>
@@ -127,18 +128,19 @@ const OrderDetails = () => {
       </div>
 
       {/* Shipping and Billing Addresses */}
+      {shippingAddress.fullName&&
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         {/* Shipping Address */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
-          <p className="font-bold mb-1">{shippingAddress.fullName}</p>
-          <p>{shippingAddress.phoneNumber}</p>
-          <p>{shippingAddress.streetLine1} {shippingAddress.streetLine2}</p>
+          <p className="font-bold mb-1">{shippingAddress?.fullName}</p>
+          <p>{shippingAddress?.phoneNumber}</p>
+          <p>{shippingAddress?.streetLine1} {shippingAddress?.streetLine2}</p>
           <p>
-            {shippingAddress.city}, {shippingAddress.province}{' '}
-            {shippingAddress.postalCode}
+            {shippingAddress?.city}, {shippingAddress?.province}{' '}
+            {shippingAddress?.postalCode}
           </p>
-          <p>{shippingAddress.country}</p>
+          <p>{shippingAddress?.country}</p>
         </div>
 
         {/* Billing Address */}
@@ -154,6 +156,7 @@ const OrderDetails = () => {
           <p>{billingAddress.country}</p>
         </div>
       </div>
+      }
     </div>
   );
 };
