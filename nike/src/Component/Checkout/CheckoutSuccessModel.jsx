@@ -31,12 +31,12 @@ const CheckoutSuccessModal = ({ isVisible, onClose, orderId, expectedDelivery })
                 <p className="mt-2">Order ID: <strong>{orderId}</strong></p>
                 <p className="mt-2">Expected Delivery: <strong>{expectedDelivery}</strong></p>
 
-                <button 
+                {/* <button 
                     onClick={onClose} 
                     className="mt-6 px-4 py-2 bg-black-500 text-white rounded-lg w-full hover:bg-blue-600"
                 >
                     Close
-                </button>
+                </button> */}
             </motion.div>
         </div>
     );

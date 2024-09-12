@@ -102,7 +102,7 @@ useEffect(() => {
         //     lat:76.1826324
         // });
         // console.log(position.coords.latitude,position.coords.longitude)
-        setBrowserCoordinates({lat:parseFloat(76.1826324), lng: parseFloat(18.2604291) });
+        setBrowserCoordinates({lat:parseFloat(position.coords.longitude), lng: parseFloat(position.coords.latitude) });
 
         // setBrowserCoordinates([position.coords.latitude,position.coords.longitude]);
         //   lat: position.coords.latitude,
