@@ -45,11 +45,14 @@ export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async (lin
   }
 });
 // Thunk to fetch eligible dealers
-export const fetchEligibleDealers = createAsyncThunk('cart/fetchEligibleDealers', async (_, { rejectWithValue }) => {
+// Thunk to fetch eligible dealers
+export const fetchEligibleDealers = createAsyncThunk('cart/fetchEligibleDealers', async (_, { rejectWithValue, getState }) => {
   try {
-    const response = await axios.get('http://106.51.242.196:50102/elgDealers', {
+    const token = getState().auth.token;
+
+    const response = await axios.get(`${api}/elgDealers`, {
       headers: {
-        accesstoken: '58c169e03202c7dcf65dc4fb9afdae689de6a101f86778c0481fee4bf8d0053b',
+        accesstoken: token,
       },
     });
     return response.data.data;
@@ -57,6 +60,7 @@ export const fetchEligibleDealers = createAsyncThunk('cart/fetchEligibleDealers'
     return rejectWithValue(error.response.data.message || error.message);
   }
 });
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {

@@ -4,10 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 
 // Assuming shop is passed as a prop
-const ShopCartList = ({ shop,deliveryType }) => {
+const ShopCartList = ({ shop,deliveryType,onClose,setSelectedOption }) => {
   const [selectedSellers, setSelectedSellers] = useState({});
   const navigate = useNavigate();
-  console.log(selectedSellers)
 
   // Handle seller selection when a card is clicked
   const handleSelectSeller = (variantId, sellerId) => {
@@ -102,31 +101,46 @@ const ShopCartList = ({ shop,deliveryType }) => {
   
 
   // Check if all variants have a selected seller
-  const isAllSelected = shop?.every((variant) => selectedSellers[variant.variantId]);
+  const isAllSelected = shop?.every((variant) => selectedSellers[variant.variantId]) || shop.length === 0;
 
 
   return (
     <div>
       <ToastContainer />
-      <div className="flex justify-between mb-3 mr-3">
-        <div ClassName="text-lg font-semibold">Choose Nearby Shop</div>
-        <button
-          onClick={handleContinue}
-          className={`px-4 py-2 text-white font-semibold rounded-md transition duration-300 ${
-            isAllSelected
-              ? "bg-black hover:bg-blue-700 cursor-pointer"
-              : "bg-gray-300 cursor-not-allowed"
-          }`}
-          disabled={!isAllSelected} // Disable the button if not all sellers are selected
-        >
-          Continue
-        </button>
-      </div>
+      <div className="flex justify-between mb-3 mr-3 sticky top-0 bg-white p-2">
+  {/* Heading */}
+  <div className="text-lg font-semibold text-gray-800">Choose Nearby Shop</div>
+
+  {/* Continue Button */}
+  <button
+    onClick={handleContinue}
+    className={`px-4 py-2 text-white font-semibold rounded-md transition duration-300 ${
+      isAllSelected
+        ? "bg-black hover:bg-indigo-900 cursor-pointer"
+        : "bg-gray-300 cursor-not-allowed"
+    }`}
+    disabled={!isAllSelected} // Disable the button if not all sellers are selected
+  >
+    Continue
+  </button>
+
+  {/* Cancel Button */}
+  <button
+    onClick={() => {
+      setSelectedOption("shipping");
+      onClose();
+    }}
+    className="px-4 py-2 text-white font-semibold rounded-md transition duration-300 bg-red-400 hover:bg-red-700 cursor-pointer"
+  >
+    Cancel
+  </button>
+</div>
+
 
       {shop.length === 0 ? (
-  <div className="text-red-600 font-semibold">
-    For This Cart Products, No Seller Is Available
-  </div>
+  <div className="text-gray-600 border border-red-500 p-2 m-2">
+  No nearby sellers for this cart items.<br/> Choose 'Ship to my address' to continue.
+</div>
 ) : (
   <>
     {shop?.map((variant, index) => (
@@ -158,9 +172,11 @@ const ShopCartList = ({ shop,deliveryType }) => {
               ))
 
           ) : (
-            <div className="text-red-600 font-semibold">
-              For this variant, no seller is available
-            </div>
+            <div className="text-red-600 border border-red-500 rounded p-2 m-2">
+            No nearby sellers for this item.<br/>Either remove this item from cart <br/> OR <br/>Choose 'Ship to my address' to continue.
+           
+          </div>
+          
           )}
 
         </div>

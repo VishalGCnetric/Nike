@@ -143,7 +143,7 @@ useEffect(() => {
             seller.coordinates.lat
           );
           distance = Math.ceil(distance);
-          console.log(`Distance from user to seller (${seller.sellerName}): ${distance} km`);
+          // console.log(`Distance from user to seller (${seller.sellerName}): ${distance} km`);
           return {
             ...seller,
             distance, // Add the distance to the seller object
@@ -277,6 +277,7 @@ useEffect(() => {
           // setSelectedOption("shipping")
 
         }}
+        setSelectedOption={setSelectedOption}
         coordinates={browserCoordinates }
         nearbyShops={nearbyShops}
         onSelectShop={handleShopSelection}

@@ -43,7 +43,6 @@ const PaymentForm = () => {
         });
        }
        
-console.log(data)
         const config = {
             method: 'post',
             maxBodyLength: Infinity,

@@ -43,7 +43,10 @@ const ThankYouPage = () => {
     lines,
     shippingAddress,
     billingAddress,
+    deliveryType
+    
   } = orderData;
+
 //   const shippingAddress = JSON.parse(localStorage.getItem('shippingAddress'));
 //   const billingAddress=JSON.parse(localStorage.getItem('shippingAddress'));
   return (
@@ -67,6 +70,7 @@ const ThankYouPage = () => {
               {state}
             </span>
           </p>
+          {/* <div>deliveryType: {deliveryType}</div> */}
         </div>
       </div>
 
