@@ -242,6 +242,8 @@ useEffect(() => {
     setIsModalOpen(false);
 
     localStorage.setItem("selectedShop", JSON.stringify(shop));
+    
+
   };
 
   // Handle shipping confirmation
@@ -296,6 +298,9 @@ useEffect(() => {
       <button 
       onClick={()=>{
         localStorage.removeItem('selectedShippingDealers');
+        localStorage.removeItem('dealerData');
+        // localStorage.removeItem('selectedShippingDealers');
+
         // localStorage.clear();
         navigate("/checkout/billing")}
 

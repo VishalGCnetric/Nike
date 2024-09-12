@@ -21,28 +21,29 @@ const ShopCartList = ({ shop,deliveryType }) => {
   };
 
   // Automatically select default sellers based on the number of sellers or distance
-  useEffect(() => {
-    shop?.forEach((variant) => {
-      if (!selectedSellers[variant.variantId]) {
-        if (variant.sellers.length === 1) {
-          // If only one seller, select it by default
-          setSelectedSellers((prevSelected) => ({
-            ...prevSelected,
-            [variant.variantId]: variant.sellers[0],
-          }));
-        } else if (variant.sellers.length > 1) {
-          // If multiple sellers, select the one with the minimum distance
-          const closestSeller = variant.sellers.reduce((minSeller, currentSeller) =>
-            currentSeller.distance < minSeller.distance ? currentSeller : minSeller
-          );
-          setSelectedSellers((prevSelected) => ({
-            ...prevSelected,
-            [variant.variantId]: closestSeller,
-          }));
-        }
-      }
-    });
-  }, [shop, selectedSellers]);
+  // useEffect(() => {
+  //   shop?.forEach((variant) => {
+  //     if (!selectedSellers[variant.variantId]) {
+  //       // if (variant.sellers.length === 1) {
+  //       //   // If only one seller, select it by default
+  //       //   setSelectedSellers((prevSelected) => ({
+  //       //     ...prevSelected,
+  //       //     [variant.variantId]: variant.sellers[0],
+  //       //   }));
+  //       // } else
+  //       //  if (variant.sellers.length >= 1) {
+  //       //   // If multiple sellers, select the one with the minimum distance
+  //       //   const closestSeller = variant.sellers.reduce((minSeller, currentSeller) =>
+  //       //     currentSeller.distance < minSeller.distance ? currentSeller : minSeller
+  //       //   );
+  //       //   setSelectedSellers((prevSelected) => ({
+  //       //     ...prevSelected,
+  //       //     [variant.variantId]: closestSeller,
+  //       //   }));
+  //       // }
+  //     }
+  //   });
+  // }, [shop, selectedSellers]);
 
   // Transform selectedSellers into the desired format
   const transformSelectedSellers = () => {
@@ -88,7 +89,7 @@ const ShopCartList = ({ shop,deliveryType }) => {
     const dealerData = {
       dealer: {
         deliveryType: deliveryType,
-        shipMethodId: Object.keys(sellerInfo).map((shipMethodId) =>shipMethodId )
+        shipMethodIds: Object.keys(sellerInfo).map((shipMethodId) =>shipMethodId )
       }
     };
   

@@ -126,7 +126,7 @@ const ThankYouPage = () => {
       {/* Shipping and Billing Addresses */}
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         {/* Shipping Address */}
-        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+        {shippingAddress?.fullName?<div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
           <p className="font-bold mb-1">{shippingAddress?.fullName} </p>
           <p>{shippingAddress.phoneNumber}</p>
@@ -136,10 +136,10 @@ const ThankYouPage = () => {
             {shippingAddress?.postalCode}
           </p>
           <p>{shippingAddress?.country}</p>
-        </div>
+        </div>:<></>}
 
         {/* Billing Address */}
-        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+        {billingAddress?.fullName?<div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Billing Address</h2>
           <p className="font-bold mb-1">{billingAddress?.fullName} </p>          <p>{billingAddress?.phoneNumber}</p>
           <p>{billingAddress?.streetLine1} {billingAddress?.streetLine2}</p>
@@ -148,7 +148,7 @@ const ThankYouPage = () => {
             {billingAddress?.postalCode}
           </p>
           <p>{billingAddress?.country}</p>
-        </div>
+        </div>:<></>}
       </div>
 
       <div className="mt-6 text-center">
